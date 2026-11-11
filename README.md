@@ -25,3 +25,7 @@ Scripts:
 | `pnpm format`       | Format all files with Prettier                    |
 | `pnpm format:check` | Check formatting without writing                  |
 | `pnpm typecheck`    | Run `astro check`                                 |
+
+## Privacy
+
+This site uses [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) to count Visitors. It is cookie-free, collects no personal data and does no cross-site tracking, so no cookie banner is needed. No other analytics or tracking code is included.

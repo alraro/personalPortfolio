@@ -91,12 +91,16 @@ it('uses the L3 light palette chosen by the Owner', () => {
   });
 });
 
-it('shows the light photo in natural colour and the dark one as duotone', () => {
-  const light = block(":root[data-theme='light']");
-  expect(light).toMatch(/--photo-filter:\s*none/);
-  expect(light).toMatch(/--photo-blend:\s*normal/);
-  expect(light).toMatch(/--photo-overlay:\s*none/);
-  expect(light).toMatch(/--dither-opacity:\s*0\.12/);
-  expect(css).toMatch(/--photo-blend:\s*multiply/);
+it('shows the photo in natural colour in both themes', () => {
+  // Owner choice: no duotone in either theme (light L3, dark option 3).
+  for (const theme of [css, block(":root[data-theme='light']")]) {
+    expect(theme).toMatch(/--photo-filter:\s*none/);
+    expect(theme).toMatch(/--photo-blend:\s*normal/);
+    expect(theme).toMatch(/--photo-overlay:\s*none/);
+  }
+  expect(css).not.toMatch(/--photo-blend:\s*multiply/);
+  expect(block(":root[data-theme='light']")).toMatch(
+    /--dither-opacity:\s*0\.12/,
+  );
   expect(css).toMatch(/--dither-opacity:\s*0\.14/);
 });

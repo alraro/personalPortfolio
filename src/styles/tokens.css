@@ -23,11 +23,13 @@
   --color-accent-contrast: #0d0c0a;
   --color-focus-ring: #f2a93b;
 
-  /* Photo duotone (Hero): shadows and highlights of the portrait, plus the
-     filter that prepares the greyscale. Dark: black to amber, as chosen on #7. */
+  /* Hero photo: natural colour in both themes (Owner choice after #7: light
+     L3, dark option 3). The duotone hooks stay so a treatment can come back
+     without touching components; shadow/highlight are unused while
+     --photo-overlay is none. */
   --color-photo-shadow: #0d0c0a;
   --color-photo-highlight: #f2a93b;
-  --photo-filter: grayscale(1) contrast(1.25);
+  --photo-filter: none;
 
   /* Typography */
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
@@ -69,8 +71,8 @@
 
 :root {
   --shadow-color: rgb(0 0 0 / 0.5);
-  --photo-blend: multiply;
-  --photo-overlay: block;
+  --photo-blend: normal;
+  --photo-overlay: none;
   --dither-opacity: 0.14;
   color-scheme: dark;
 }

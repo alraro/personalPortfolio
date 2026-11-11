@@ -1,4 +1,5 @@
 ---
+import ExperienceEducation from '../../components/ExperienceEducation.astro';
 import FeaturedProjects from '../../components/FeaturedProjects.astro';
 import Events from '../../components/Events.astro';
 import MoreProjects from '../../components/MoreProjects.astro';
@@ -27,6 +28,7 @@ const name = 'Alfonso Ramos Rojas';
       <h1 class="text-4xl font-bold">{name}</h1>
       <p class="text-text-muted">{t(locale, 'home.comingSoon')}</p>
     </div>
+    <ExperienceEducation locale={locale} />
     <FeaturedProjects locale={locale} />
     <MoreProjects locale={locale} />
     <Events locale={locale} />

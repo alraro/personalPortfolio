@@ -1,0 +1,53 @@
+---
+import { getEducation, getExperience } from '../lib/catalogue';
+import { t, type Locale } from '../i18n';
+import SectionHeading from './SectionHeading.astro';
+import TimelineItem from './TimelineItem.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const [experience, education] = await Promise.all([
+  getExperience(locale),
+  getEducation(locale),
+]);
+const groups = [
+  {
+    id: 'experience-group',
+    heading: 'experience.experience',
+    items: experience,
+  },
+  { id: 'education-group', heading: 'experience.education', items: education },
+] as const;
+---
+
+{(experience.length > 0 || education.length > 0) && (
+  <section
+    aria-labelledby="experience"
+    class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16"
+  >
+    <SectionHeading id="experience">
+      {t(locale, 'experience.heading')}
+    </SectionHeading>
+    <div class="grid gap-10 lg:grid-cols-2 lg:gap-16">
+      {groups
+        .filter((group) => group.items.length > 0)
+        .map((group) => (
+          <div>
+            <h3
+              id={group.id}
+              class="mb-6 font-mono text-sm tracking-wide text-accent uppercase"
+            >
+              {t(locale, group.heading)}
+            </h3>
+            <ol aria-labelledby={group.id}>
+              {group.items.map((item) => (
+                <TimelineItem item={item} locale={locale} />
+              ))}
+            </ol>
+          </div>
+        ))}
+    </div>
+  </section>
+)}

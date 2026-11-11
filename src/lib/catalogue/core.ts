@@ -22,6 +22,29 @@ export interface ProjectLinkInput {
   url: string;
 }
 
+/** An optimised image as Astro's `image()` helper resolves it. */
+export interface ImageAsset {
+  src: string;
+  width: number;
+  height: number;
+  format:
+    'svg' | 'avif' | 'png' | 'webp' | 'jpeg' | 'jpg' | 'apng' | 'tiff' | 'gif';
+}
+
+/** Media as written in `meta.yaml` (images already resolved by `image()`). */
+export type MediaInput =
+  | { kind: 'image'; src: ImageAsset }
+  | {
+      kind: 'video';
+      mp4: string;
+      webm?: string;
+      /** Required; optional here only so a missing poster is reported. */
+      poster?: ImageAsset;
+    };
+
+/** Largest accepted Media video, in bytes. */
+export const MAX_VIDEO_BYTES = 4 * 1024 * 1024;
+
 /** Locale-independent data of one Project (its `meta.yaml`). */
 export interface ProjectMeta {
   slug: string;
@@ -29,6 +52,7 @@ export interface ProjectMeta {
   featured: boolean;
   tags: string[];
   links: { primary: ProjectLinkInput; secondary?: ProjectLinkInput[] };
+  media?: MediaInput;
 }
 
 /** Localized data of one Project (its `en.md` or `es.md`). */
@@ -37,6 +61,8 @@ export interface ProjectText {
   locale: Locale;
   title: string;
   subtitle: string;
+  /** Alt text of the Project's Media. */
+  mediaAlt?: string;
   /** Markdown body: the long description. */
   body: string;
 }
@@ -51,6 +77,17 @@ export interface GeneratedCover {
   title: string;
   tagline: string;
 }
+
+export type ProjectMedia =
+  | { kind: 'image'; image: ImageAsset; alt: string }
+  | {
+      kind: 'video';
+      mp4: string;
+      webm?: string;
+      poster: ImageAsset;
+      alt: string;
+    }
+  | GeneratedCover;
 
 /** Award a Project inherits from the Event it was built at. */
 export interface ProjectAward {
@@ -67,7 +104,7 @@ export interface Project {
   tags: string[];
   primaryLink: ProjectLink;
   secondaryLinks: ProjectLink[];
-  cover: GeneratedCover;
+  media: ProjectMedia;
   /** Inherited from the Event that references this Project. */
   award?: ProjectAward;
 }
@@ -92,6 +129,59 @@ export class ContentError extends Error {
 }
 
 const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Size in bytes of a file under `public/`, or undefined if it is missing. */
+export type FileSize = (publicPath: string) => number | undefined;
+
+function validateMedia(
+  metas: readonly ProjectMeta[],
+  texts: readonly ProjectText[],
+  fileSize: FileSize,
+): string[] {
+  const problems: string[] = [];
+  for (const meta of metas) {
+    const { media } = meta;
+    for (const locale of locales) {
+      const alt = texts.find(
+        (text) => text.slug === meta.slug && text.locale === locale,
+      )?.mediaAlt;
+      if (media && (alt === undefined || alt.trim() === '')) {
+        problems.push(
+          `Project "${meta.slug}" ("${locale}"): "mediaAlt" is required when the Project has media`,
+        );
+      } else if (!media && alt !== undefined) {
+        problems.push(
+          `Project "${meta.slug}" ("${locale}"): "mediaAlt" is set without media`,
+        );
+      }
+    }
+    if (media?.kind !== 'video') continue;
+    if (!media.poster) {
+      problems.push(`Project "${meta.slug}": video media needs a "poster"`);
+    }
+    const prefix = `/media/projects/${meta.slug}/`;
+    for (const path of [media.mp4, media.webm]) {
+      if (path === undefined) continue;
+      if (!path.startsWith(prefix) || path.includes('..')) {
+        problems.push(
+          `Project "${meta.slug}": video path "${path}" must start with ${prefix}`,
+        );
+        continue;
+      }
+      const size = fileSize(path);
+      if (size === undefined) {
+        problems.push(
+          `Project "${meta.slug}": video file "${path}" does not exist under public/`,
+        );
+      } else if (size > MAX_VIDEO_BYTES) {
+        problems.push(
+          `Project "${meta.slug}": video file "${path}" is larger than 4 MB`,
+        );
+      }
+    }
+  }
+  return problems;
+}
 
 function validateProjects(
   metas: readonly ProjectMeta[],
@@ -156,6 +246,28 @@ function toLink(input: ProjectLinkInput, locale: Locale): ProjectLink {
   };
 }
 
+function toMedia(meta: ProjectMeta, text: ProjectText): ProjectMedia {
+  const { media } = meta;
+  const alt = text.mediaAlt ?? '';
+  if (media?.kind === 'image') {
+    return { kind: 'image', image: media.src, alt };
+  }
+  if (media?.kind === 'video') {
+    return {
+      kind: 'video',
+      mp4: media.mp4,
+      ...(media.webm !== undefined && { webm: media.webm }),
+      poster: media.poster!,
+      alt,
+    };
+  }
+  return {
+    kind: 'generated',
+    title: text.title,
+    tagline: meta.tags.join(' \u00b7 '),
+  };
+}
+
 function toProject(
   meta: ProjectMeta,
   text: ProjectText,
@@ -171,11 +283,7 @@ function toProject(
     secondaryLinks: (meta.links.secondary ?? []).map((link) =>
       toLink(link, text.locale),
     ),
-    cover: {
-      kind: 'generated',
-      title: text.title,
-      tagline: meta.tags.join(' · '),
-    },
+    media: toMedia(meta, text),
     ...(award ? { award } : {}),
   };
 }
@@ -191,11 +299,16 @@ export function buildProjectLists(input: {
   metas: readonly ProjectMeta[];
   texts: readonly ProjectText[];
   locale: Locale;
+  /** Reports video file sizes; the adapter reads them from `public/`. */
+  fileSize?: FileSize;
   /** Award per Project slug, from `buildEvents` in `./events.ts`. */
   awards?: ReadonlyMap<string, ProjectAward>;
 }): ProjectLists {
-  const { metas, texts, locale, awards } = input;
-  const problems = validateProjects(metas, texts);
+  const { metas, texts, locale, fileSize = () => undefined, awards } = input;
+  const problems = [
+    ...validateProjects(metas, texts),
+    ...validateMedia(metas, texts, fileSize),
+  ];
   if (problems.length > 0) throw new ContentError(problems);
 
   const projects = [...metas]

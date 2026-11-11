@@ -101,7 +101,7 @@ describe('buildProjectLists', () => {
       texts: both('a'),
       locale: 'en',
     }).featured;
-    expect(project!.cover).toEqual({
+    expect(project!.media).toEqual({
       kind: 'generated',
       title: 'a en',
       tagline: 'C · Ray tracing · 42',

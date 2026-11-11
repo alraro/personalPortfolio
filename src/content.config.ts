@@ -24,25 +24,39 @@ const projectMeta = defineCollection({
     pattern: '*/meta.yaml',
     generateId,
   }),
-  schema: z.strictObject({
-    order: z.number().int().min(1),
-    featured: z.boolean(),
-    tags: z.array(z.string().min(1).max(24)).min(1).max(6),
-    links: z
-      .strictObject({
-        primary: link,
-        secondary: z.array(link).max(3).optional(),
-      })
-      .superRefine((links, ctx) => {
-        if (links.secondary?.some((l) => l.url === links.primary.url)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'secondary links must not repeat the primary URL',
-            path: ['secondary'],
-          });
-        }
-      }),
-  }),
+  schema: ({ image }) =>
+    z.strictObject({
+      order: z.number().int().min(1),
+      featured: z.boolean(),
+      tags: z.array(z.string().min(1).max(24)).min(1).max(6),
+      links: z
+        .strictObject({
+          primary: link,
+          secondary: z.array(link).max(3).optional(),
+        })
+        .superRefine((links, ctx) => {
+          if (links.secondary?.some((l) => l.url === links.primary.url)) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'secondary links must not repeat the primary URL',
+              path: ['secondary'],
+            });
+          }
+        }),
+      // Image files live inside the Project folder (relative paths); video
+      // files live under public/media/projects/<slug>/ (checked by the core).
+      media: z
+        .discriminatedUnion('kind', [
+          z.strictObject({ kind: z.literal('image'), src: image() }),
+          z.strictObject({
+            kind: z.literal('video'),
+            mp4: z.string(),
+            webm: z.string().optional(),
+            poster: image(),
+          }),
+        ])
+        .optional(),
+    }),
 });
 
 /** `src/content/projects/<slug>/{en,es}.md`: localized fields + long description. */
@@ -55,6 +69,70 @@ const projectText = defineCollection({
   schema: z.strictObject({
     title: z.string().min(1).max(60),
     subtitle: z.string().min(1).max(120),
+    mediaAlt: z.string().min(1).max(160).optional(),
+  }),
+});
+
+const yearMonth = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM');
+const httpsUrl = z
+  .url()
+  .refine((url) => url.startsWith('https://'), 'must be an https:// URL');
+
+// Experience and Education: `src/content/<kind>/<slug>/{meta.yaml,en.md,es.md}`.
+// Cross-field rules (end >= start) are checked by the catalogue core, which
+// reports every problem at once.
+const experienceMeta = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    organization: z.string().min(1).max(80),
+    organizationUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const experienceText = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    role: z.string().min(1).max(80),
+    organization: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
+  }),
+});
+const educationMeta = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    institution: z.string().min(1).max(80),
+    institutionUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const educationText = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    programme: z.string().min(1).max(100),
+    institution: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
   }),
 });
 
@@ -68,10 +146,7 @@ const eventMeta = defineCollection({
   schema: z.strictObject({
     date: z.string().regex(EVENT_DATE, 'must be YYYY-MM or YYYY-MM-DD'),
     role: z.enum(EVENT_ROLES),
-    url: z
-      .url()
-      .refine((url) => url.startsWith('https://'), 'must be an https:// URL')
-      .optional(),
+    url: httpsUrl.optional(),
     project: z.string().min(1).optional(),
   }),
 });
@@ -90,8 +165,12 @@ const eventText = defineCollection({
 });
 
 export const collections = {
-  projectMeta,
-  projectText,
   eventMeta,
   eventText,
+  projectMeta,
+  projectText,
+  experienceMeta,
+  experienceText,
+  educationMeta,
+  educationText,
 };

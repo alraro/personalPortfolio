@@ -2,6 +2,6 @@
 role: Research Assistant
 ---
 
-<!-- TODO(owner): draft description (only the role and group are known); write 1-3 sentences. -->
+<!-- TODO(owner): minimal on purpose (role and group only, nothing confidential); approve or extend. -->
 
 Research Assistant at Mobilenet, the Mobile Networks Research Group of the University of Málaga.

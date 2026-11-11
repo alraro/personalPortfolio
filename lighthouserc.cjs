@@ -4,8 +4,8 @@
 const preset = process.env.AUDIT_PRESET === 'desktop' ? 'desktop' : 'mobile';
 
 // URLs to audit, relative to the static build in dist/.
-// Edit here: the i18n ticket replaces '/' with '/en/' and '/es/'.
-const urls = ['/'];
+// Edit here. '/' is only a redirect page, so the real homes are audited.
+const urls = ['/en/', '/es/'];
 
 module.exports = {
   ci: {

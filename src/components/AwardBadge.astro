@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  /** The Award, for example "2nd place". */
+  award: string;
+  /** Name of the Event that gave the Award. */
+  eventName: string;
+  class?: string;
+}
+const { award, eventName, class: className } = Astro.props;
+---
+
+{/* Uppercase is CSS only, so screen readers read the normal-case text. */}
+<span
+  data-award-badge
+  class:list={[
+    'inline-flex items-center gap-1.5 border border-accent px-2 py-0.5 font-mono text-xs tracking-wide text-text uppercase',
+    className,
+  ]}
+>
+  <Icon name="Trophy" class="text-accent [stroke-width:1.5]" />
+  <span>
+    {award} — {eventName}
+  </span>
+</span>

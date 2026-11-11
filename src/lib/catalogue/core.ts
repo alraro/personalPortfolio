@@ -52,6 +52,13 @@ export interface GeneratedCover {
   tagline: string;
 }
 
+/** Award a Project inherits from the Event it was built at. */
+export interface ProjectAward {
+  /** For example "2nd place". */
+  text: string;
+  eventName: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -61,6 +68,8 @@ export interface Project {
   primaryLink: ProjectLink;
   secondaryLinks: ProjectLink[];
   cover: GeneratedCover;
+  /** Inherited from the Event that references this Project. */
+  award?: ProjectAward;
 }
 
 export interface ProjectLists {
@@ -147,7 +156,11 @@ function toLink(input: ProjectLinkInput, locale: Locale): ProjectLink {
   };
 }
 
-function toProject(meta: ProjectMeta, text: ProjectText): Project {
+function toProject(
+  meta: ProjectMeta,
+  text: ProjectText,
+  award: ProjectAward | undefined,
+): Project {
   return {
     slug: meta.slug,
     title: text.title,
@@ -163,6 +176,7 @@ function toProject(meta: ProjectMeta, text: ProjectText): Project {
       title: text.title,
       tagline: meta.tags.join(' · '),
     },
+    ...(award ? { award } : {}),
   };
 }
 
@@ -177,8 +191,10 @@ export function buildProjectLists(input: {
   metas: readonly ProjectMeta[];
   texts: readonly ProjectText[];
   locale: Locale;
+  /** Award per Project slug, from `buildEvents` in `./events.ts`. */
+  awards?: ReadonlyMap<string, ProjectAward>;
 }): ProjectLists {
-  const { metas, texts, locale } = input;
+  const { metas, texts, locale, awards } = input;
   const problems = validateProjects(metas, texts);
   if (problems.length > 0) throw new ContentError(problems);
 
@@ -189,7 +205,10 @@ export function buildProjectLists(input: {
         (candidate) =>
           candidate.slug === meta.slug && candidate.locale === locale,
       )!;
-      return { featured: meta.featured, project: toProject(meta, text) };
+      return {
+        featured: meta.featured,
+        project: toProject(meta, text, awards?.get(meta.slug)),
+      };
     });
 
   return {

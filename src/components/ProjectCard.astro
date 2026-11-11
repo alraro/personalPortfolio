@@ -1,6 +1,7 @@
 ---
 import type { Project } from '../lib/catalogue/core';
 import type { Locale } from '../i18n';
+import AwardBadge from './AwardBadge.astro';
 import ProjectCardLinks from './ProjectCardLinks.astro';
 import ProjectCardMedia from './ProjectCardMedia.astro';
 import ProjectCardTags from './ProjectCardTags.astro';
@@ -46,6 +47,13 @@ const layout = {
         <ProjectCardMedia project={project} />
       </div>
       <div class="flex min-w-0 flex-col gap-4">
+        {project.award && (
+          <AwardBadge
+            award={project.award.text}
+            eventName={project.award.eventName}
+            class="self-start"
+          />
+        )}
         <ProjectCardTitle
           project={project}
           locale={locale}
@@ -65,8 +73,16 @@ const layout = {
         titleClass="text-2xl"
       />
       <ProjectCardTags tags={project.tags} />
-      {/* Award label slot: the Events ticket fills it; renders nothing now. */}
-      <slot name="award" />
+      {/* Award slot: shows the inherited Award unless a caller overrides it. */}
+      <slot name="award">
+        {project.award && (
+          <AwardBadge
+            award={project.award.text}
+            eventName={project.award.eventName}
+            class="self-start"
+          />
+        )}
+      </slot>
       <div class="mt-auto">
         <ProjectCardLinks project={project} locale={locale} />
       </div>

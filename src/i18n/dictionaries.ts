@@ -14,6 +14,18 @@ export const en = {
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Projects',
   'moreProjects.heading': 'More projects',
+  'events.heading': 'Hackathons & Events',
+  'event.role.participant': 'Participant',
+  'event.role.volunteer': 'Volunteer',
+  'event.seeProject': 'See project',
+  'ds.awardBadge': 'AwardBadge',
+  'ds.awardBadgeNote':
+    'Shown in uppercase through CSS only; the text itself keeps normal case.',
+  'ds.eventRow': 'EventRow',
+  'ds.eventRowNote':
+    'Sample data (not the content collections): with Award and Project, with a website only, and plain.',
+  'ds.awardSampleEvent': 'Sample Hackathon',
+  'ds.awardSampleAward': '2nd place',
   'ds.title': 'Design system',
   'ds.intro':
     'This page documents the design tokens and base components used across the portfolio. It is for the Owner and contributors, not for Visitors.',
@@ -94,6 +106,18 @@ export const es: Dictionary = {
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Proyectos',
   'moreProjects.heading': 'Más proyectos',
+  'events.heading': 'Hackatones y eventos',
+  'event.role.participant': 'Participante',
+  'event.role.volunteer': 'Voluntario',
+  'event.seeProject': 'Ver proyecto',
+  'ds.awardBadge': 'AwardBadge',
+  'ds.awardBadgeNote':
+    'Se muestra en mayúsculas solo mediante CSS; el texto conserva las minúsculas.',
+  'ds.eventRow': 'EventRow',
+  'ds.eventRowNote':
+    'Datos de ejemplo (no las colecciones de contenido): con Award y Project, solo con sitio web, y simple.',
+  'ds.awardSampleEvent': 'Hackatón de ejemplo',
+  'ds.awardSampleAward': '2º puesto',
   'ds.title': 'Sistema de diseño',
   'ds.intro':
     'Esta página documenta los tokens de diseño y los componentes base del portfolio. Es para el Owner y colaboradores, no para los Visitors.',

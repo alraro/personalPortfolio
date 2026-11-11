@@ -1,5 +1,6 @@
 ---
 import FeaturedProjects from '../../components/FeaturedProjects.astro';
+import Events from '../../components/Events.astro';
 import MoreProjects from '../../components/MoreProjects.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
@@ -28,5 +29,6 @@ const name = 'Alfonso Ramos Rojas';
     </div>
     <FeaturedProjects locale={locale} />
     <MoreProjects locale={locale} />
+    <Events locale={locale} />
   </main>
 </LocaleLayout>

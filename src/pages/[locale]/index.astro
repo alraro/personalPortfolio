@@ -11,7 +11,11 @@ const locale = Astro.params.locale as Locale;
 const name = 'Alfonso Ramos Rojas';
 ---
 
-<LocaleLayout locale={locale} title={name}>
+<LocaleLayout
+  locale={locale}
+  title={name}
+  description={t(locale, 'meta.description')}
+>
   <header class="flex justify-end p-4">
     <LanguageSwitch locale={locale} />
   </header>

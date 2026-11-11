@@ -1,6 +1,7 @@
 ---
 import ExperienceEducation from '../../components/ExperienceEducation.astro';
 import FeaturedProjects from '../../components/FeaturedProjects.astro';
+import MoreProjects from '../../components/MoreProjects.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
 import { locales, t, type Locale } from '../../i18n';
@@ -28,5 +29,6 @@ const name = 'Alfonso Ramos Rojas';
     </div>
     <ExperienceEducation locale={locale} />
     <FeaturedProjects locale={locale} />
+    <MoreProjects locale={locale} />
   </main>
 </LocaleLayout>

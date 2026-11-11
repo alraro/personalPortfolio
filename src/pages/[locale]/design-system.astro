@@ -18,7 +18,9 @@ import type {
 import samplePoster from '../../assets/design-system/sample-poster.png';
 import sampleImage from '../../assets/design-system/sample-image.png';
 import Icon from '../../components/Icon.astro';
+import Footer from '../../components/Footer.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
+import Nav from '../../components/Nav.astro';
 import Link from '../../components/Link.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import TimelineItem from '../../components/TimelineItem.astro';
@@ -28,6 +30,7 @@ import Tag from '../../components/Tag.astro';
 import ThemeToggle from '../../components/ThemeToggle.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
 import { locales, t, type Locale } from '../../i18n';
+import { buildNavItems } from '../../lib/nav';
 import { getProfile } from '../../lib/profile';
 
 export function getStaticPaths() {
@@ -36,6 +39,15 @@ export function getStaticPaths() {
 
 const locale = Astro.params.locale as Locale;
 const profile = await getProfile(locale);
+// The page itself has an About demo and the footer; the demo Navs show them all.
+const pageNavItems = buildNavItems({ about: true, contact: true });
+const allNavItems = buildNavItems({
+  about: true,
+  experience: true,
+  projects: true,
+  events: true,
+  contact: true,
+});
 
 // Class names are written out in full so Tailwind can see them.
 const colorTokens = [
@@ -221,12 +233,13 @@ const card = 'rounded-lg border border-border bg-surface p-5';
   description={t(locale, 'ds.intro')}
   noindex
 >
-  <header class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 pt-6">
-    <LanguageSwitch locale={locale} />
-    <ThemeToggle locale={locale} />
-  </header>
+  <Nav locale={locale} name={profile.name} items={pageNavItems} />
 
-  <main class="mx-auto flex max-w-5xl flex-col gap-16 px-4 pt-10 pb-24">
+  <main
+    id="main"
+    tabindex="-1"
+    class="mx-auto flex max-w-5xl flex-col gap-16 px-4 pt-10 pb-24 focus:outline-none"
+  >
     <div class="flex flex-col gap-4">
       <h1 class="font-display text-5xl leading-(--leading-display) font-semibold tracking-(--tracking-display)">
         {t(locale, 'ds.title')}
@@ -710,6 +723,37 @@ const card = 'rounded-lg border border-border bg-surface p-5';
 
       <div class:list={[card, 'flex flex-col gap-3']}>
         <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.nav')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.navNote')}</p>
+        <p class="font-mono text-sm text-text-muted">
+          {t(locale, 'ds.navDesktop')}
+        </p>
+        <div class="overflow-hidden rounded-md border border-border">
+          <Nav
+            locale={locale}
+            name={profile.name}
+            items={allNavItems}
+            idPrefix="ds-nav-desktop"
+            sticky={false}
+          />
+        </div>
+        <p class="font-mono text-sm text-text-muted">
+          {t(locale, 'ds.navMobile')}
+        </p>
+        <div class="min-h-72 overflow-hidden rounded-md border border-border">
+          <Nav
+            locale={locale}
+            name={profile.name}
+            items={allNavItems}
+            forceMobile
+            idPrefix="ds-nav-mobile"
+          />
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
           {t(locale, 'ds.themeToggle')}
         </h3>
         <div>
@@ -727,6 +771,12 @@ const card = 'rounded-lg border border-border bg-surface p-5';
       </div>
     </section>
   </main>
+  <Footer
+    locale={locale}
+    github={profile.github}
+    linkedin={profile.linkedin}
+    email={profile.email}
+  />
 </LocaleLayout>
 
 <script>

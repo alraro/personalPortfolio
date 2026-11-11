@@ -30,6 +30,13 @@ export const en = {
   'ds.photo': 'Photo treatment',
   'ds.photoNote':
     'Duotone made from the photo-shadow and photo-highlight tokens, so it adapts to the theme.',
+  'experience.heading': 'Experience & Education',
+  'experience.experience': 'Experience',
+  'experience.education': 'Education',
+  'timeline.present': 'Present',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Current entry, closed entry, entry without URL and entry without description.',
   'moreProjects.heading': 'More projects',
   'ds.title': 'Design system',
   'ds.intro':
@@ -67,6 +74,12 @@ export const en = {
   'ds.sectionHeading': 'SectionHeading',
   'ds.sectionHeadingSample': 'Sample heading',
   'ds.generatedCover': 'GeneratedCover',
+  'ds.projectMedia': 'ProjectMedia',
+  'ds.projectMediaImage': 'kind: image',
+  'ds.projectMediaVideo':
+    'kind: video (hover, focus or scroll into view to play)',
+  'ds.projectCardVideo': 'ProjectCard with video Media',
+  'ds.mediaAlt': 'Sample test pattern',
   'ds.linkBare': 'Link, bare and icon-only (used inside cards)',
   'ds.projectCard': 'ProjectCard (featured)',
   'ds.projectCardCompact': 'ProjectCard (compact)',
@@ -127,6 +140,13 @@ export const es: Dictionary = {
   'ds.photo': 'Tratamiento de la foto',
   'ds.photoNote':
     'Duotono hecho con los tokens photo-shadow y photo-highlight, así se adapta al tema.',
+  'experience.heading': 'Experiencia y formación',
+  'experience.experience': 'Experiencia',
+  'experience.education': 'Formación',
+  'timeline.present': 'actualidad',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Entrada actual, entrada cerrada, entrada sin URL y entrada sin descripción.',
   'moreProjects.heading': 'Más proyectos',
   'ds.title': 'Sistema de diseño',
   'ds.intro':
@@ -164,6 +184,12 @@ export const es: Dictionary = {
   'ds.sectionHeading': 'SectionHeading',
   'ds.sectionHeadingSample': 'Título de ejemplo',
   'ds.generatedCover': 'GeneratedCover',
+  'ds.projectMedia': 'ProjectMedia',
+  'ds.projectMediaImage': 'kind: image',
+  'ds.projectMediaVideo':
+    'kind: video (pasar el ratón, enfocar o hacer scroll para reproducir)',
+  'ds.projectCardVideo': 'ProjectCard con vídeo',
+  'ds.mediaAlt': 'Carta de ajuste de ejemplo',
   'ds.linkBare': 'Link, sin estilo y solo icono (usado dentro de tarjetas)',
   'ds.projectCard': 'ProjectCard (featured)',
   'ds.projectCardCompact': 'ProjectCard (compacta)',

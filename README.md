@@ -43,6 +43,19 @@ Content lives in versioned content files in this repository. (Details to be comp
 
 Put the PDF in `public/cv/` named `cv-en.pdf` and/or `cv-es.pdf`. The "Download CV" button then appears automatically on `/en/` and/or `/es/`, one language at a time. With no file for a language, no button is shown. Do not commit a placeholder PDF.
 
+### Adding Media to a Project
+
+A Project can have optional `media` in its `meta.yaml`, plus a `mediaAlt` (1 to 160 characters) in **both** `en.md` and `es.md`. Without `media`, the Project keeps its generated cover.
+
+- `kind: image`: `src` is an image file inside the Project's folder (for example `./cover.png`). It is optimised automatically.
+- `kind: video`: `mp4` (required) and `webm` (optional) are paths under `public/media/projects/<slug>/`, for example `/media/projects/minirt/demo.mp4`, and `poster` is an image file inside the Project's folder.
+- Media is shown in a 16:10 frame (cropped to fit, so keep the subject centred).
+- Videos must be at most 4 MB, ideally at most 15 seconds and silent. They play on hover or keyboard focus on desktop, and when scrolled into view on touch devices; never with reduced motion.
+- Always provide a poster and alt text in both languages.
+- Prefer MP4/WebM over GIF.
+
+The build fails with a clear message if a rule is broken.
+
 ## Development
 
 Prerequisites:

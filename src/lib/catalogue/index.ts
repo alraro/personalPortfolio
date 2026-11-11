@@ -25,8 +25,16 @@ export type {
   Project,
   ProjectLink,
   GeneratedCover,
+  ProjectAward,
   ProjectMedia,
 } from './core';
+export type { EventView } from './events';
+import {
+  buildEvents,
+  type EventMeta,
+  type EventText,
+  type EventView,
+} from './events';
 import {
   buildEducationList,
   buildExperienceList,
@@ -44,6 +52,22 @@ function publicFileSize(publicPath: string): number | undefined {
   return existsSync(file) ? statSync(file).size : undefined;
 }
 
+async function loadEvents(locale: Locale, projects: Project[]) {
+  const [metaEntries, textEntries] = await Promise.all([
+    getCollection('eventMeta'),
+    getCollection('eventText'),
+  ]);
+  const metas: EventMeta[] = metaEntries.map((entry) => ({
+    ...entry.data,
+    slug: entry.id.split('/')[0]!,
+  }));
+  const texts: EventText[] = textEntries.map((entry) => {
+    const [slug, entryLocale] = entry.id.split('/') as [string, Locale];
+    return { ...entry.data, slug, locale: entryLocale, body: entry.body ?? '' };
+  });
+  return buildEvents({ metas, texts, projects, locale });
+}
+
 async function loadProjectLists(locale: Locale) {
   const [metaEntries, textEntries] = await Promise.all([
     getCollection('projectMeta'),
@@ -57,7 +81,24 @@ async function loadProjectLists(locale: Locale) {
     const [slug, entryLocale] = entry.id.split('/') as [string, Locale];
     return { ...entry.data, slug, locale: entryLocale, body: entry.body ?? '' };
   });
-  return buildProjectLists({ metas, texts, locale, fileSize: publicFileSize });
+  // Validates Projects first; the Events then give each Project its Award.
+  const plain = buildProjectLists({
+    metas,
+    texts,
+    locale,
+    fileSize: publicFileSize,
+  });
+  const { awards } = await loadEvents(locale, [
+    ...plain.featured,
+    ...plain.more,
+  ]);
+  return buildProjectLists({
+    metas,
+    texts,
+    locale,
+    fileSize: publicFileSize,
+    awards,
+  });
 }
 
 /** Featured Projects for `locale`, sorted by `order`. Throws ContentError. */
@@ -117,4 +158,10 @@ export async function getEducation(locale: Locale): Promise<EducationItem[]> {
     };
   });
   return buildEducationList({ metas, texts, locale });
+}
+
+/** Events for `locale`, newest first. Throws ContentError. */
+export async function getEvents(locale: Locale): Promise<EventView[]> {
+  const { featured, more } = await loadProjectLists(locale);
+  return (await loadEvents(locale, [...featured, ...more])).events;
 }

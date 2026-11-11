@@ -1,5 +1,7 @@
 ---
+import AwardBadge from '../../components/AwardBadge.astro';
 import Button from '../../components/Button.astro';
+import EventRow from '../../components/EventRow.astro';
 import GeneratedCover from '../../components/GeneratedCover.astro';
 import ProjectMedia from '../../components/ProjectMedia.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
@@ -16,6 +18,7 @@ import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import Link from '../../components/Link.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import TimelineItem from '../../components/TimelineItem.astro';
+import type { EventView } from '../../lib/catalogue/events';
 import type { TimelineItemData } from '../../lib/catalogue/timeline';
 import Tag from '../../components/Tag.astro';
 import ThemeToggle from '../../components/ThemeToggle.astro';
@@ -165,6 +168,42 @@ const compactGrid = [
   sampleProject('ds-grid-a', 'Grid one'),
   sampleProject('ds-grid-b', 'Grid two'),
   sampleProject('ds-grid-c', 'Grid three'),
+];
+
+const awardEvent = t(locale, 'ds.awardSampleEvent');
+const awardText = t(locale, 'ds.awardSampleAward');
+const awardFeatured: Project = {
+  ...sampleProject('ds-award-featured', 'Award sample'),
+  award: { text: awardText, eventName: awardEvent },
+};
+const awardCompact: Project = {
+  ...sampleProject('ds-award-compact', 'Award compact'),
+  award: { text: awardText, eventName: awardEvent },
+};
+const sampleEvents: EventView[] = [
+  {
+    slug: 'ds-event-award',
+    name: awardEvent,
+    dateLabel: locale === 'es' ? 'mar 2026' : 'Mar 2026',
+    roleLabel: t(locale, 'event.role.participant'),
+    award: awardText,
+    url: 'https://example.com/event',
+    note: t(locale, 'ds.sample'),
+    project: { title: 'Award sample', anchor: '#project-ds-award-featured' },
+  },
+  {
+    slug: 'ds-event-website',
+    name: awardEvent,
+    dateLabel: locale === 'es' ? 'jul 2025' : 'Jul 2025',
+    roleLabel: t(locale, 'event.role.volunteer'),
+    url: 'https://example.com/event',
+  },
+  {
+    slug: 'ds-event-plain',
+    name: awardEvent,
+    dateLabel: locale === 'es' ? 'ene 2025' : 'Jan 2025',
+    roleLabel: t(locale, 'event.role.participant'),
+  },
 ];
 
 const card = 'rounded-lg border border-border bg-surface p-5';
@@ -557,6 +596,38 @@ const card = 'rounded-lg border border-border bg-surface p-5';
                 variant="compact"
               />
             </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.awardBadge')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.awardBadgeNote')}</p>
+        <AwardBadge
+          award={awardText}
+          eventName={awardEvent}
+          class="self-start"
+        />
+        <ProjectCard project={awardFeatured} locale={locale} />
+        <div class="max-w-sm">
+          <ProjectCard
+            project={awardCompact}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.eventRow')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.eventRowNote')}</p>
+        <ul id="ds-event-rows">
+          {sampleEvents.map((event) => (
+            <EventRow event={event} locale={locale} />
           ))}
         </ul>
       </div>

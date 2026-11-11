@@ -1,0 +1,38 @@
+---
+import type { EventView } from '../lib/catalogue/events';
+import { t, type Locale } from '../i18n';
+import AwardBadge from './AwardBadge.astro';
+import Link from './Link.astro';
+import Tag from './Tag.astro';
+
+interface Props {
+  event: EventView;
+  locale: Locale;
+}
+const { event, locale } = Astro.props;
+---
+
+<li
+  data-event-row
+  class="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-border py-4"
+>
+  <span class="font-mono text-sm text-text-muted">{event.dateLabel}</span>
+  <span class="font-display text-lg font-semibold">
+    {event.url ? (
+      <Link href={event.url} locale={locale}>
+        {event.name}
+      </Link>
+    ) : (
+      event.name
+    )}
+  </span>
+  <Tag>{event.roleLabel}</Tag>
+  {event.award && <AwardBadge award={event.award} eventName={event.name} />}
+  {event.project && (
+    <Link href={event.project.anchor} locale={locale}>
+      {t(locale, 'event.seeProject')}
+      <span class="sr-only">: {event.project.title}</span>
+    </Link>
+  )}
+  {event.note && <p class="basis-full text-text-muted">{event.note}</p>}
+</li>

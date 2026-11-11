@@ -5,7 +5,7 @@ export type Theme = 'dark' | 'light';
 /** Values of the `background` token per theme, used for `<meta name="theme-color">`. */
 export const themeColors: Record<Theme, string> = {
   dark: '#0d0c0a',
-  light: '#faf6ef',
+  light: '#f6efe2',
 };
 
 export function oppositeTheme(theme: Theme): Theme {

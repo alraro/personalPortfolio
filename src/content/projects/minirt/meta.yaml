@@ -1,0 +1,11 @@
+# TODO(owner): draft seed content; final copy comes in the seed-content ticket.
+order: 1
+featured: true
+tags:
+  - C
+  - Ray tracing
+  - '42'
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/miniRT

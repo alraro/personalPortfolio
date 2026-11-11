@@ -1,0 +1,36 @@
+---
+// Typographic cover for Projects without Media: title in the display font and a
+// monospaced tagline, over a CSS-only dot grid. Decorative (the title is
+// already in the card), so it is hidden from assistive technology.
+interface Props {
+  title: string;
+  tagline: string;
+  class?: string;
+}
+const { title, tagline, class: className } = Astro.props;
+---
+
+<div
+  aria-hidden="true"
+  data-generated-cover
+  class:list={[
+    'cover flex aspect-[16/10] w-full flex-col justify-end gap-3 overflow-hidden rounded-md border border-border bg-surface p-6',
+    className,
+  ]}
+>
+  <p class="font-display text-4xl leading-(--leading-display) font-semibold tracking-(--tracking-display) break-words">
+    {title}
+  </p>
+  <p class="font-mono text-sm text-text-muted">{tagline}</p>
+</div>
+
+<style>
+  .cover {
+    background-image: radial-gradient(
+      circle,
+      var(--color-border) 1px,
+      transparent 1px
+    );
+    background-size: 1.25rem 1.25rem;
+  }
+</style>

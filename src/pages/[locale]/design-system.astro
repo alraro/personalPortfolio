@@ -1,5 +1,9 @@
 ---
 import Button from '../../components/Button.astro';
+import GeneratedCover from '../../components/GeneratedCover.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectSpine from '../../components/ProjectSpine.astro';
+import type { Project } from '../../lib/catalogue/core';
 import Icon from '../../components/Icon.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import Link from '../../components/Link.astro';
@@ -64,6 +68,40 @@ const variants = [
   { variant: 'ghost', label: t(locale, 'ds.ghost') },
 ] as const;
 const sizes = ['sm', 'md'] as const;
+
+const sampleProject = (slug: string, title: string): Project => ({
+  slug,
+  title,
+  subtitle: t(locale, 'ds.sample'),
+  descriptionHtml: `<p>${t(locale, 'ds.sample')}. <code>${slug}</code></p>`,
+  tags: ['C', 'Ray tracing', '42'],
+  primaryLink: {
+    type: 'repository',
+    url: 'https://example.com/primary',
+    label: t(locale, 'linkType.repository'),
+  },
+  secondaryLinks: [
+    {
+      type: 'demo',
+      url: 'https://example.com/demo',
+      label: t(locale, 'linkType.demo'),
+    },
+    {
+      type: 'paper',
+      url: 'https://example.com/paper',
+      label: t(locale, 'linkType.paper'),
+    },
+  ],
+  cover: {
+    kind: 'generated',
+    title,
+    tagline: ['C', 'Ray tracing', '42'].join(' · '),
+  },
+});
+const demoRight = sampleProject('ds-right', 'Sample Project');
+const demoLeft = sampleProject('ds-left', 'Another Project');
+const spineA = sampleProject('ds-spine-a', 'Spine one');
+const spineB = sampleProject('ds-spine-b', 'Spine two');
 
 const card = 'rounded-lg border border-border bg-surface p-5';
 ---
@@ -344,6 +382,61 @@ const card = 'rounded-lg border border-border bg-surface p-5';
         <SectionHeading id="ds-heading-sample" eyebrow="01">
           {t(locale, 'ds.sectionHeadingSample')}
         </SectionHeading>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.generatedCover')}
+        </h3>
+        <div class="max-w-md">
+          <GeneratedCover
+            title={demoRight.cover.title}
+            tagline={demoRight.cover.tagline}
+          />
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.linkBare')}
+        </h3>
+        <p>
+          <Link href="https://example.com/" locale={locale} bare iconOnly>
+            <Icon name="Globe" />
+            <span class="sr-only">{t(locale, 'linkType.website')}</span>
+          </Link>
+        </p>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.projectCard')}
+        </h3>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectCardMediaRight')}
+        </code>
+        <ProjectCard project={demoRight} locale={locale} side="media-right" />
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectCardMediaLeft')}
+        </code>
+        <ProjectCard project={demoLeft} locale={locale} side="media-left" />
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.projectSpine')}
+        </h3>
+        <p class="text-sm text-text-muted">
+          {t(locale, 'ds.projectSpineNote')}
+        </p>
+        <ProjectSpine label={t(locale, 'ds.projectSpine')}>
+          <li>
+            <ProjectCard project={spineA} locale={locale} side="media-right" />
+          </li>
+          <li>
+            <ProjectCard project={spineB} locale={locale} side="media-left" />
+          </li>
+        </ProjectSpine>
       </div>
 
       <div class:list={[card, 'flex flex-col gap-3']}>

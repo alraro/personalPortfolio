@@ -69,29 +69,34 @@
 
 :root {
   --shadow-color: rgb(0 0 0 / 0.5);
+  --photo-blend: multiply;
+  --photo-overlay: block;
+  --dither-opacity: 0.14;
   color-scheme: dark;
 }
 
-/* Light theme. Ratios: text/bg 16.4, text/surface 16.0, text-muted/bg 5.5,
-   text-muted/surface 5.4, accent/bg 4.7, accent/surface 4.5,
-   accent-contrast/accent 5.0, focus-ring/bg 4.7. */
+/* Light theme (variant L3, chosen by the Owner). Ratios: text/bg 16.7,
+   text/surface 19.1, text-muted/bg 7.1, text-muted/surface 8.1, accent/bg 5.7,
+   accent/surface 6.5, accent-contrast/accent 6.5, focus-ring/bg 5.7. */
 :root[data-theme='light'] {
-  --color-background: #faf6ef;
-  --color-surface: #f8f3ea;
+  --color-background: #f6efe2;
+  --color-surface: #ffffff;
   --color-surface-raised: #ffffff;
-  --color-text: #1b1813;
-  --color-text-muted: #6b6355;
-  --color-border: #cfc5b2;
-  --color-accent: #b45309;
+  --color-text: #120f0a;
+  --color-text-muted: #574f42;
+  --color-border: #a89a80;
+  --color-accent: #9a4506;
   --color-accent-contrast: #ffffff;
-  --color-focus-ring: #b45309;
-  /* Light photo: never multiplied over the dark accent (muddy brown). Shadows
-     are the foreground ink, highlights a pale amber close to the background,
-     and the greyscale is lifted so the face reads clearly on cream. */
-  --color-photo-shadow: #1b1813;
-  --color-photo-highlight: #fbefd8;
-  --photo-filter: grayscale(1) contrast(0.95) brightness(1.55);
-  --shadow-color: rgb(27 24 19 / 0.18);
+  --color-focus-ring: #9a4506;
+  /* Light photo: natural colour, no duotone (filter, blend and overlay layers
+     are switched off; the shadow/highlight colours are then unused). */
+  --color-photo-shadow: #120f0a;
+  --color-photo-highlight: #ffffff;
+  --photo-filter: none;
+  --photo-blend: normal;
+  --photo-overlay: none;
+  --dither-opacity: 0.12;
+  --shadow-color: rgb(18 15 10 / 0.22);
   color-scheme: light;
 }
 

@@ -74,5 +74,29 @@ it('keeps the theme-color meta values equal to the background tokens', () => {
 
 it('uses the Hero decision accents', () => {
   expect(themes.dark.accent).toBe('#f2a93b');
-  expect(themes.light.accent).toBe('#b45309');
+  expect(themes.light.accent).toBe('#9a4506');
+});
+
+it('uses the L3 light palette chosen by the Owner', () => {
+  expect(themes.light).toMatchObject({
+    background: '#f6efe2',
+    surface: '#ffffff',
+    'surface-raised': '#ffffff',
+    border: '#a89a80',
+    text: '#120f0a',
+    'text-muted': '#574f42',
+    accent: '#9a4506',
+    'accent-contrast': '#ffffff',
+    'focus-ring': '#9a4506',
+  });
+});
+
+it('shows the light photo in natural colour and the dark one as duotone', () => {
+  const light = block(":root[data-theme='light']");
+  expect(light).toMatch(/--photo-filter:\s*none/);
+  expect(light).toMatch(/--photo-blend:\s*normal/);
+  expect(light).toMatch(/--photo-overlay:\s*none/);
+  expect(light).toMatch(/--dither-opacity:\s*0\.12/);
+  expect(css).toMatch(/--photo-blend:\s*multiply/);
+  expect(css).toMatch(/--dither-opacity:\s*0\.14/);
 });

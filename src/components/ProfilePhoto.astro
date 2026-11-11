@@ -41,7 +41,7 @@ const { photo, alt, priority = false, class: className } = Astro.props;
   }
   .profile-photo :global(img) {
     filter: var(--photo-filter);
-    mix-blend-mode: multiply;
+    mix-blend-mode: var(--photo-blend);
   }
   .profile-photo::before {
     content: '';
@@ -51,6 +51,7 @@ const { photo, alt, priority = false, class: className } = Astro.props;
     background-color: var(--color-photo-shadow);
     mix-blend-mode: lighten;
     pointer-events: none;
+    display: var(--photo-overlay);
   }
   .profile-photo::after {
     content: '';
@@ -61,5 +62,6 @@ const { photo, alt, priority = false, class: className } = Astro.props;
     mix-blend-mode: overlay;
     opacity: 0.35;
     pointer-events: none;
+    display: var(--photo-overlay);
   }
 </style>

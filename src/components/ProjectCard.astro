@@ -1,16 +1,16 @@
 ---
 import type { Project } from '../lib/catalogue/core';
-import { t, type Locale } from '../i18n';
-import Icon from './Icon.astro';
-import Link from './Link.astro';
-import ProjectMedia from './ProjectMedia.astro';
-import Tag from './Tag.astro';
+import type { Locale } from '../i18n';
+import ProjectCardLinks from './ProjectCardLinks.astro';
+import ProjectCardMedia from './ProjectCardMedia.astro';
+import ProjectCardTags from './ProjectCardTags.astro';
+import ProjectCardTitle from './ProjectCardTitle.astro';
 
 interface Props {
   project: Project;
   locale: Locale;
-  variant?: 'featured';
-  /** Which column holds the media on screens >= 768 px. */
+  variant?: 'featured' | 'compact';
+  /** Featured only: which column holds the media on screens >= 768 px. */
   side?: 'media-right' | 'media-left';
   class?: string;
 }
@@ -23,17 +23,13 @@ const {
   class: className,
 } = Astro.props;
 
-const linkIcons = {
-  repository: 'Code',
-  website: 'Globe',
-  demo: 'Play',
-  paper: 'FileText',
-} as const;
-
-const linkName = (type: string) =>
-  t(locale, 'project.linkName')
-    .replace('{type}', type)
-    .replace('{title}', project.title);
+const base =
+  'group relative rounded-lg border border-border bg-background p-4 transition-[border-color,transform] duration-(--duration-base) ease-(--ease-standard) focus-within:border-accent hover:border-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+const layout = {
+  featured:
+    'grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-16 md:p-6 md:hover:-translate-y-1',
+  compact: 'flex h-full flex-col gap-4 hover:-translate-y-1',
+};
 ---
 
 {/* The title link's ::after covers the whole card (whole-card link). Secondary
@@ -42,57 +38,41 @@ const linkName = (type: string) =>
   id={`project-${project.slug}`}
   data-project-card
   data-variant={variant}
-  data-side={side}
-  class:list={[
-    'group relative grid grid-cols-1 items-center gap-6 rounded-lg border border-border bg-background p-4 transition-[border-color,transform] duration-(--duration-base) ease-(--ease-standard) focus-within:border-accent hover:border-accent md:grid-cols-2 md:gap-16 md:p-6 md:hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
-    className,
-  ]}
+  data-side={variant === 'featured' ? side : undefined}
+  class:list={[base, layout[variant], className]}
 >
-  <div class:list={['min-w-0', side === 'media-right' && 'md:order-2']}>
-    <ProjectMedia media={project.media} />
-  </div>
-  <div class="flex min-w-0 flex-col gap-4">
-    <div class="flex flex-col gap-2">
-      <h3 class="font-display text-3xl leading-(--leading-display) font-semibold tracking-(--tracking-display)">
-        <Link
-          href={project.primaryLink.url}
+  {variant === 'featured' ? (
+    <>
+      <div class:list={['min-w-0', side === 'media-right' && 'md:order-2']}>
+        <ProjectCardMedia project={project} />
+      </div>
+      <div class="flex min-w-0 flex-col gap-4">
+        <ProjectCardTitle
+          project={project}
           locale={locale}
-          bare
-          iconOnly
-          class="after:absolute after:inset-0 after:content-['']"
-        >
-          {project.title}
-        </Link>
-      </h3>
-      <p class="font-mono text-sm text-text-muted">{project.subtitle}</p>
-    </div>
-    <div class="prose" set:html={project.descriptionHtml} />
-    <ul class="flex flex-wrap gap-2">
-      {project.tags.map((tag) => (
-        <li>
-          <Tag>{tag}</Tag>
-        </li>
-      ))}
-    </ul>
-    {project.secondaryLinks.length > 0 && (
-      <ul class="relative z-10 flex gap-4 text-xl">
-        {project.secondaryLinks.map((link) => (
-          <li>
-            <Link
-              href={link.url}
-              locale={locale}
-              bare
-              iconOnly
-              class="inline-flex text-text-muted transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-accent"
-            >
-              <Icon name={linkIcons[link.type]} />
-              <span class="sr-only">{linkName(link.label)}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
+          titleClass="text-3xl"
+        />
+        <div class="prose" set:html={project.descriptionHtml} />
+        <ProjectCardTags tags={project.tags} />
+        <ProjectCardLinks project={project} locale={locale} />
+      </div>
+    </>
+  ) : (
+    <>
+      <ProjectCardMedia project={project} />
+      <ProjectCardTitle
+        project={project}
+        locale={locale}
+        titleClass="text-2xl"
+      />
+      <ProjectCardTags tags={project.tags} />
+      {/* Award label slot: the Events ticket fills it; renders nothing now. */}
+      <slot name="award" />
+      <div class="mt-auto">
+        <ProjectCardLinks project={project} locale={locale} />
+      </div>
+    </>
+  )}
 </article>
 
 <style>

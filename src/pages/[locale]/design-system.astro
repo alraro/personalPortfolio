@@ -128,6 +128,23 @@ const demoLeft = sampleProject('ds-left', 'Another Project');
 const spineA = sampleProject('ds-spine-a', 'Spine one');
 const spineB = sampleProject('ds-spine-b', 'Spine two');
 
+const compactCover = sampleProject('ds-compact-cover', 'Compact cover');
+const compactImage = sampleProject(
+  'ds-compact-image',
+  'Compact image',
+  imageMedia,
+);
+const compactVideo = sampleProject(
+  'ds-compact-video',
+  'Compact video',
+  videoMedia,
+);
+const compactGrid = [
+  sampleProject('ds-grid-a', 'Grid one'),
+  sampleProject('ds-grid-b', 'Grid two'),
+  sampleProject('ds-grid-c', 'Grid three'),
+];
+
 const card = 'rounded-lg border border-border bg-surface p-5';
 ---
 
@@ -467,6 +484,59 @@ const card = 'rounded-lg border border-border bg-surface p-5';
           {t(locale, 'ds.projectCardVideo')}
         </code>
         <ProjectCard project={demoVideo} locale={locale} side="media-right" />
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.projectCardCompact')}
+        </h3>
+        <p class="text-sm text-text-muted">
+          {t(locale, 'ds.compactMediaNote')}
+        </p>
+        <div class="max-w-sm">
+          <ProjectCard
+            project={compactCover}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaImage')}
+        </code>
+        <div class="max-w-sm">
+          <ProjectCard
+            project={compactImage}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaVideo')}
+        </code>
+        <div class="max-w-sm">
+          <ProjectCard
+            project={compactVideo}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+        <h4 class="font-mono text-sm text-text-muted">
+          {t(locale, 'ds.moreProjectsGrid')}
+        </h4>
+        <ul
+          id="ds-more-grid"
+          class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {compactGrid.map((project) => (
+            <li>
+              <ProjectCard
+                project={project}
+                locale={locale}
+                variant="compact"
+              />
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div class:list={[card, 'flex flex-col gap-4']}>

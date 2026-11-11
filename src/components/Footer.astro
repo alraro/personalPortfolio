@@ -1,0 +1,58 @@
+---
+import { t, type Locale } from '../i18n';
+import ContactLinks from './ContactLinks.astro';
+import Link from './Link.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  locale: Locale;
+  github: string;
+  linkedin: string;
+  email: string;
+}
+
+const { locale, github, linkedin, email } = Astro.props;
+const repositoryUrl = 'https://github.com/alraro/personalPortfolio';
+const year = String(new Date().getFullYear());
+---
+
+<footer id="contact" class="scroll-mt-24 border-t border-border">
+  <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16">
+    <div class="flex flex-col gap-4">
+      <SectionHeading id="contact-heading">
+        {t(locale, 'contact.label')}
+      </SectionHeading>
+      <p class="max-w-[65ch] text-lg text-text">
+        {t(locale, 'contact.invite')}
+      </p>
+      <ContactLinks
+        locale={locale}
+        github={github}
+        linkedin={linkedin}
+        email={email}
+      />
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <h3 class="font-display text-xl font-semibold">
+        {t(locale, 'footer.builtHeading')}
+      </h3>
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        <li>
+          <Link href={repositoryUrl} locale={locale}>
+            {t(locale, 'footer.sourceCode')}
+          </Link>
+        </li>
+        <li>
+          <Link href={`/${locale}/design-system/`} locale={locale}>
+            {t(locale, 'footer.designSystem')}
+          </Link>
+        </li>
+      </ul>
+    </div>
+
+    <p class="font-mono text-sm text-text-muted">
+      {t(locale, 'footer.copyright').replace('{year}', year)}
+    </p>
+  </div>
+</footer>

@@ -16,28 +16,59 @@ A portfolio that presents the Owner's Projects, Experience, Education, Events an
 - **pnpm**: a fast package manager with a reproducible lockfile.
 - **Cloudflare Pages**: hosting and the deploy pipeline are under version control.
 
+## Architecture
+
+- **Astro static output with React islands.** Pages are rendered to plain HTML at build time. React is used only for the animated hero (dithered background and decrypted name), loaded lazily and only when the Visitor allows motion.
+- **Content catalogue (core and adapter).** Content files are read in one place, `src/lib/catalogue/index.ts` (the Astro adapter, the only module besides `src/content.config.ts` that touches the content collections). It hands plain data to the pure core (`core.ts`, `timeline.ts`, `events.ts`), which validates everything and builds the view models. Pages and components never read collections themselves. A broken or half-translated item fails the build with one message listing every problem.
+- **i18n.** English and Spanish live under `/en/` and `/es/`. UI strings are in the typed dictionaries in `src/i18n/` (a missing key fails the build); content has one Markdown file per language. The root page redirects by stored choice, then browser language, then English.
+- **Tokens and theme.** Colours, fonts and motion are design tokens in `src/styles/tokens.css` (dark by default, a light override on `data-theme`). Tailwind classes read the tokens, and an inline script sets the theme before first paint. The design-system page at `/en/design-system/` shows every component.
+- **Security headers.** `src/integrations/security-headers.mjs` runs at build time: it hashes the inline scripts of the built pages and writes `dist/_headers` with a Content Security Policy and other headers for Cloudflare Pages.
+
 ## Pipeline
 
 On every pull request and on merge to `main`:
 
-1. Lint (ESLint and Prettier)
-2. Typecheck
-3. Content validation (planned)
-4. Build
-5. Unit tests
-6. Browser and accessibility tests
-7. Lighthouse thresholds (planned)
-8. Link check (planned)
-9. Preview deploy (pull requests)
-10. Production deploy (merge to `main`)
+1. Lint (ESLint and Prettier) and typecheck (`astro check`)
+2. Build, which includes content validation: the catalogue fails the build on any invalid Project, Experience, Education or Event
+3. Unit tests (Vitest)
+4. Browser and accessibility tests (Playwright with axe), in a job that runs in the official Playwright container image
+5. Lighthouse (mobile and desktop) with a minimum score of 95 in performance, accessibility, best practices and SEO
+6. Link check (lychee). Absolute links to this site are remapped to the fresh build, so new pages in a pull request are not reported as broken
+7. Preview deploy (pull requests)
+8. Production deploy (merge to `main`)
+
+A separate weekly workflow checks the links of the production site.
 
 ## Editing content
 
-Content lives in versioned content files in this repository. (Details to be completed by the content tickets.)
+Content lives in versioned files in this repository, in `src/content/`. Every item has a `meta.yaml` (data shared by both languages) and an `en.md` and `es.md` (localized fields in the frontmatter, the Markdown body is the description). Both languages are required. HTML comments in Markdown are removed from the output. The build fails with a clear message if a rule is broken.
 
 ### Profile (name, photo, headline, About)
 
 `src/content/profile/` holds `meta.yaml` (name, photo, GitHub, LinkedIn and email), `photo.jpg`, and `en.md` / `es.md` (frontmatter `headline` and `photoAlt`; the body is the About text). Edit these files; both languages are required.
+
+### Adding a Project
+
+Create `src/content/projects/<slug>/` with:
+
+- `meta.yaml`: `order` (integer, 1 or more; lower comes first), `featured` (`true` shows it in the large Featured list, `false` in the compact "More projects" list), `tags` (1 to 6), `links.primary` (`type` is `repository`, `website`, `demo` or `paper`, with an `https://` `url`) and optional `links.secondary` (up to 3), and optional `media` (see below).
+- `en.md` and `es.md`: frontmatter `title` (up to 60 characters) and `subtitle` (up to 120), plus `mediaAlt` when the Project has media. The body is the long description.
+
+To reorder, change `order`. To move a Project between lists, change `featured`.
+
+### Adding Experience or Education
+
+Create `src/content/experience/<slug>/` or `src/content/education/<slug>/`, again with `meta.yaml`, `en.md` and `es.md`. There is no `order`: items are sorted with the current one first (`end: null`), then by end and start date, newest first.
+
+- Experience `meta.yaml`: `organization`, optional `organizationUrl`, `location`, `start` and `end` (`YYYY-MM`, `end: null` for ongoing). Each language file has `role` in the frontmatter.
+- Education `meta.yaml`: `institution`, optional `institutionUrl`, `location`, `start`, `end`. Each language file has `programme`.
+- Language files may override `organization` / `institution` and `location` for that language. The body is an optional description.
+
+### Adding an Event (and linking it to a Project)
+
+Create `src/content/events/<slug>/` with `meta.yaml`: `date` (`YYYY-MM` or `YYYY-MM-DD`), `role` (`participant` or `volunteer`), optional `url`, and optional `project` (the slug of a Project). `en.md` and `es.md` have `name` and an optional `award` (up to 40 characters); the body is an optional one-sentence note, shown as plain text. Events are listed newest first.
+
+To record an Award, set `project` to the Project's slug and `award` in each language file (for example "1st place"). The Project then shows an Award badge with the Event name. An unknown `project` slug fails the build, and only one Event may point to a given Project; both language files need the `award` or neither.
 
 ### Adding a CV
 
@@ -87,7 +118,7 @@ Scripts:
 
 There are two test seams:
 
-- **Pure logic (Vitest, `node` environment, no DOM or Astro runtime).** Test files sit next to the module they test as `src/**/*.test.ts` (for example `src/lib/format-year.ts` and `src/lib/format-year.test.ts`).
+- **Pure logic (Vitest, `node` environment, no DOM or Astro runtime).** Test files sit next to the module they test as `src/**/*.test.ts` (for example `src/lib/nav.ts` and `src/lib/nav.test.ts`).
 - **The built site in a real browser (Playwright with axe).** Tests live in `e2e/*.spec.ts` and run in two projects, `desktop` (1280x800) and `mobile` (390x844, touch). They run against the production build served by `pnpm preview`, so run `pnpm build` first. Call `expectNoAxeViolations(page)` from `e2e/helpers/axe.ts` for accessibility checks (WCAG 2.0 to 2.2 A/AA).
 
 First time only: `pnpm exec playwright install chromium`. After a failing run, open the report with `pnpm exec playwright show-report`.

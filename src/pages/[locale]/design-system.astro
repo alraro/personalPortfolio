@@ -1,6 +1,10 @@
 ---
+import About from '../../components/About.astro';
 import Button from '../../components/Button.astro';
+import ContactLinks from '../../components/ContactLinks.astro';
 import GeneratedCover from '../../components/GeneratedCover.astro';
+import Hero from '../../components/Hero.astro';
+import ProfilePhoto from '../../components/ProfilePhoto.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import ProjectSpine from '../../components/ProjectSpine.astro';
 import type { Project } from '../../lib/catalogue/core';
@@ -12,12 +16,14 @@ import Tag from '../../components/Tag.astro';
 import ThemeToggle from '../../components/ThemeToggle.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
 import { locales, t, type Locale } from '../../i18n';
+import { getProfile } from '../../lib/profile';
 
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
 
 const locale = Astro.params.locale as Locale;
+const profile = await getProfile(locale);
 
 // Class names are written out in full so Tailwind can see them.
 const colorTokens = [
@@ -437,6 +443,45 @@ const card = 'rounded-lg border border-border bg-surface p-5';
             <ProjectCard project={spineB} locale={locale} side="media-left" />
           </li>
         </ProjectSpine>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.contactLinks')}
+        </h3>
+        <ContactLinks
+          locale={locale}
+          github={profile.github}
+          linkedin={profile.linkedin}
+          email={profile.email}
+        />
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.photo')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.photoNote')}</p>
+        <ProfilePhoto
+          photo={profile.photo}
+          alt={profile.photoAlt}
+          class="size-48"
+        />
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.hero')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.heroNote')}</p>
+        <Hero locale={locale} profile={profile} headingLevel="h2" />
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.about')}
+        </h3>
+        <About locale={locale} html={profile.aboutHtml} />
       </div>
 
       <div class:list={[card, 'flex flex-col gap-3']}>

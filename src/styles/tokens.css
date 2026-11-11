@@ -23,6 +23,12 @@
   --color-accent-contrast: #0d0c0a;
   --color-focus-ring: #f2a93b;
 
+  /* Photo duotone (Hero): shadows and highlights of the portrait, plus the
+     filter that prepares the greyscale. Dark: black to amber, as chosen on #7. */
+  --color-photo-shadow: #0d0c0a;
+  --color-photo-highlight: #f2a93b;
+  --photo-filter: grayscale(1) contrast(1.25);
+
   /* Typography */
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
   --font-body:
@@ -79,6 +85,12 @@
   --color-accent: #b45309;
   --color-accent-contrast: #ffffff;
   --color-focus-ring: #b45309;
+  /* Light photo: never multiplied over the dark accent (muddy brown). Shadows
+     are the foreground ink, highlights a pale amber close to the background,
+     and the greyscale is lifted so the face reads clearly on cream. */
+  --color-photo-shadow: #1b1813;
+  --color-photo-highlight: #fbefd8;
+  --photo-filter: grayscale(1) contrast(0.95) brightness(1.55);
   --shadow-color: rgb(27 24 19 / 0.18);
   color-scheme: light;
 }

@@ -1,0 +1,68 @@
+---
+import type { Profile } from '../lib/profile';
+import { t, type Locale } from '../i18n';
+import Button from './Button.astro';
+import ContactLinks from './ContactLinks.astro';
+import HeroBackground from './hero/HeroBackground';
+import HeroName from './hero/HeroName';
+import ProfilePhoto from './ProfilePhoto.astro';
+
+interface Props {
+  locale: Locale;
+  profile: Profile;
+  /** The home page uses h1 (the page's only h1); the design-system demo uses h2. */
+  headingLevel?: 'h1' | 'h2';
+}
+
+const { locale, profile, headingLevel: Heading = 'h1' } = Astro.props;
+---
+
+{/* data-motion starts as "static" and the background island switches it to
+    "animated" once hydrated with motion allowed (testing hook). The name and
+    headline are plain text in the HTML; the effects only enhance them. */}
+<section
+  data-hero
+  data-motion="static"
+  class="relative isolate overflow-hidden"
+>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 -z-10 opacity-[0.14]"
+  >
+    <HeroBackground client:idle />
+  </div>
+  <div class="mx-auto grid min-h-[calc(100svh-5rem)] w-full max-w-6xl grid-cols-1 items-center gap-8 px-4 py-12 lg:grid-cols-[1fr_auto] lg:gap-16 lg:py-20">
+    <ProfilePhoto
+      photo={profile.photo}
+      alt={profile.photoAlt}
+      priority
+      class="order-first size-48 justify-self-start lg:order-last lg:size-72"
+    />
+    <div class="flex flex-col gap-5">
+      <Heading class="font-display text-5xl leading-(--leading-display) font-semibold tracking-(--tracking-display)">
+        <HeroName client:idle name={profile.name} />
+      </Heading>
+      <p class="font-mono text-xl text-accent">{profile.headline}</p>
+      <div class="mt-2 flex flex-col gap-4">
+        <ContactLinks
+          locale={locale}
+          github={profile.github}
+          linkedin={profile.linkedin}
+          email={profile.email}
+        />
+        {profile.cvUrl && (
+          <div>
+            <Button
+              href={profile.cvUrl}
+              variant="primary"
+              icon="Download"
+              download
+            >
+              {t(locale, 'hero.downloadCv')}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>

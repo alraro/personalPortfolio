@@ -23,14 +23,6 @@
   --color-accent-contrast: #0d0c0a;
   --color-focus-ring: #f2a93b;
 
-  /* Hero photo: natural colour in both themes (Owner choice after #7: light
-     L3, dark option 3). The duotone hooks stay so a treatment can come back
-     without touching components; shadow/highlight are unused while
-     --photo-overlay is none. */
-  --color-photo-shadow: #0d0c0a;
-  --color-photo-highlight: #f2a93b;
-  --photo-filter: none;
-
   /* Typography */
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
   --font-body:
@@ -71,8 +63,6 @@
 
 :root {
   --shadow-color: rgb(0 0 0 / 0.5);
-  --photo-blend: normal;
-  --photo-overlay: none;
   --dither-opacity: 0.14;
   color-scheme: dark;
 }
@@ -90,13 +80,6 @@
   --color-accent: #9a4506;
   --color-accent-contrast: #ffffff;
   --color-focus-ring: #9a4506;
-  /* Light photo: natural colour, no duotone (filter, blend and overlay layers
-     are switched off; the shadow/highlight colours are then unused). */
-  --color-photo-shadow: #120f0a;
-  --color-photo-highlight: #ffffff;
-  --photo-filter: none;
-  --photo-blend: normal;
-  --photo-overlay: none;
   --dither-opacity: 0.12;
   --shadow-color: rgb(18 15 10 / 0.22);
   color-scheme: light;

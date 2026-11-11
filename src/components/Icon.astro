@@ -5,7 +5,7 @@
 //  - Custom (brands neither library ships): name is a key of src/lib/custom-icons.ts.
 import { icons as lucideIcons } from 'lucide';
 import * as simpleIcons from 'simple-icons';
-import { customIcons } from '../lib/custom-icons';
+import { customIcons, type CustomIconName } from '../lib/custom-icons';
 
 interface Props {
   source?: 'lucide' | 'simple' | 'custom';
@@ -28,7 +28,8 @@ const brand =
       ]
     : undefined;
 
-const customPath = source === 'custom' ? customIcons[name] : undefined;
+const customPath =
+  source === 'custom' ? customIcons[name as CustomIconName] : undefined;
 
 if (!lucideNode && !brand && !customPath) {
   throw new Error(`Unknown ${source} icon "${name}"`);

@@ -1,7 +1,6 @@
 import type { Locale } from './locale';
 
 export const en = {
-  'home.comingSoon': 'Portfolio coming soon.',
   'meta.description':
     'Software engineering student at the University of Málaga, research assistant at Mobilenet and student at 42 Málaga. Projects in systems, DevOps and more.',
   'meta.title.home': 'Alfonso Ramos Rojas — Software Engineering Student',
@@ -57,7 +56,7 @@ export const en = {
   'ds.about': 'About',
   'ds.photo': 'Photo treatment',
   'ds.photoNote':
-    'Duotone made from the photo-shadow and photo-highlight tokens, so it adapts to the theme.',
+    'The profile photo in natural colour in both themes: no filter, blend or overlay is applied.',
   'experience.heading': 'Experience & Education',
   'experience.experience': 'Experience',
   'experience.education': 'Education',
@@ -147,7 +146,6 @@ export type Dictionary = Record<DictionaryKey, string>;
 
 // Typed against the keys of `en`: a missing or extra key fails `pnpm build`.
 export const es: Dictionary = {
-  'home.comingSoon': 'Portfolio próximamente.',
   'meta.description':
     'Estudiante de Ingeniería del Software en la Universidad de Málaga, investigador en Mobilenet y alumno de 42 Málaga. Proyectos de sistemas, DevOps y más.',
   'meta.title.home':
@@ -207,7 +205,7 @@ export const es: Dictionary = {
   'ds.about': 'About',
   'ds.photo': 'Tratamiento de la foto',
   'ds.photoNote':
-    'Duotono hecho con los tokens photo-shadow y photo-highlight, así se adapta al tema.',
+    'La foto de perfil en su color natural en ambos temas: no se aplica ningún filtro, mezcla ni capa.',
   'experience.heading': 'Experiencia y formación',
   'experience.experience': 'Experiencia',
   'experience.education': 'Formación',

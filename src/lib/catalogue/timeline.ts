@@ -4,9 +4,8 @@
  * Same contract as `core.ts`: plain parsed data in, view models out, or one
  * `ContentError` listing EVERY problem found.
  */
-import { marked } from 'marked';
 import { locales, t, type Locale } from '../../i18n';
-import { ContentError } from './core';
+import { ContentError, findText, renderMarkdown } from './core';
 
 const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const YEAR_MONTH = /^(\d{4})-(0[1-9]|1[0-2])$/;
@@ -144,9 +143,7 @@ function validate(
 
   for (const meta of metas) {
     for (const locale of locales) {
-      const text = texts.find(
-        (c) => c.slug === meta.slug && c.locale === locale,
-      );
+      const text = findText(texts, meta.slug, locale);
       if (!text) {
         problems.push(
           `${kind} "${meta.slug}": missing "${locale}" translation`,
@@ -161,9 +158,7 @@ function validate(
   return problems;
 }
 
-function html(body: string): string {
-  return body.trim() === '' ? '' : marked.parse(body, { async: false });
-}
+const html = renderMarkdown;
 
 /**
  * Validates all Experience entries (in every locale) and returns them for
@@ -181,9 +176,7 @@ export function buildExperienceList(input: {
   if (problems.length > 0) throw new ContentError(problems);
 
   return [...metas].sort(compareTimeline).map((meta) => {
-    const text = texts.find(
-      (c) => c.slug === meta.slug && c.locale === locale,
-    )!;
+    const text = findText(texts, meta.slug, locale)!;
     return {
       slug: meta.slug,
       role: text.role,
@@ -208,9 +201,7 @@ export function buildEducationList(input: {
   if (problems.length > 0) throw new ContentError(problems);
 
   return [...metas].sort(compareTimeline).map((meta) => {
-    const text = texts.find(
-      (c) => c.slug === meta.slug && c.locale === locale,
-    )!;
+    const text = findText(texts, meta.slug, locale)!;
     return {
       slug: meta.slug,
       programme: text.programme,

@@ -14,6 +14,34 @@
 import { marked } from 'marked';
 import { locales, t, type DictionaryKey, type Locale } from '../../i18n';
 
+/** Removes HTML comments, so an Owner's `<!-- TODO -->` never reaches the page. */
+export function stripHtmlComments(text: string): string {
+  let current = text;
+  let previous: string;
+  do {
+    previous = current;
+    current = current.replace(/<!--[\s\S]*?-->/g, '');
+  } while (current !== previous);
+  return current;
+}
+
+/** Renders catalogue Markdown to HTML with HTML comments removed. */
+export function renderMarkdown(body: string): string {
+  if (body.trim() === '') return '';
+  // Strip the rendered output: a comment inside a code span is escaped, so it
+  // stays visible, while raw comments are removed.
+  return stripHtmlComments(marked.parse(body, { async: false }));
+}
+
+/** The text of `slug` in `locale`, or undefined when it is missing. */
+export function findText<T extends { slug: string; locale: Locale }>(
+  texts: readonly T[],
+  slug: string,
+  locale: Locale,
+): T | undefined {
+  return texts.find((text) => text.slug === slug && text.locale === locale);
+}
+
 export const LINK_TYPES = ['repository', 'website', 'demo', 'paper'] as const;
 export type LinkType = (typeof LINK_TYPES)[number];
 
@@ -82,7 +110,8 @@ export type ProjectMedia =
   | { kind: 'image'; image: ImageAsset; alt: string }
   | {
       kind: 'video';
-      mp4: string;
+      /** Optional in the view model only; content (`meta.yaml`) requires it. */
+      mp4?: string;
       webm?: string;
       poster: ImageAsset;
       alt: string;
@@ -142,9 +171,7 @@ function validateMedia(
   for (const meta of metas) {
     const { media } = meta;
     for (const locale of locales) {
-      const alt = texts.find(
-        (text) => text.slug === meta.slug && text.locale === locale,
-      )?.mediaAlt;
+      const alt = findText(texts, meta.slug, locale)?.mediaAlt;
       if (media && (alt === undefined || alt.trim() === '')) {
         problems.push(
           `Project "${meta.slug}" ("${locale}"): "mediaAlt" is required when the Project has media`,
@@ -220,10 +247,7 @@ function validateProjects(
 
   for (const meta of metas) {
     for (const locale of locales) {
-      const text = texts.find(
-        (candidate) =>
-          candidate.slug === meta.slug && candidate.locale === locale,
-      );
+      const text = findText(texts, meta.slug, locale);
       if (!text) {
         problems.push(
           `Project "${meta.slug}": missing "${locale}" translation`,
@@ -277,7 +301,7 @@ function toProject(
     slug: meta.slug,
     title: text.title,
     subtitle: text.subtitle,
-    descriptionHtml: marked.parse(text.body, { async: false }),
+    descriptionHtml: renderMarkdown(text.body),
     tags: meta.tags,
     primaryLink: toLink(meta.links.primary, text.locale),
     secondaryLinks: (meta.links.secondary ?? []).map((link) =>
@@ -314,10 +338,7 @@ export function buildProjectLists(input: {
   const projects = [...metas]
     .sort((a, b) => a.order - b.order)
     .map((meta) => {
-      const text = texts.find(
-        (candidate) =>
-          candidate.slug === meta.slug && candidate.locale === locale,
-      )!;
+      const text = findText(texts, meta.slug, locale)!;
       return {
         featured: meta.featured,
         project: toProject(meta, text, awards?.get(meta.slug)),

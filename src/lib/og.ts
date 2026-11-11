@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
 import satori from 'satori';
+import { SITE_URL } from './seo';
 
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
@@ -138,7 +139,7 @@ export async function renderOgImage({
           color: tokens.text,
           marginTop: 72,
         },
-        'alfonsoramos.dev',
+        new URL(SITE_URL).host,
       ),
     ],
   );

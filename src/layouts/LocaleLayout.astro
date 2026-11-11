@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
 import ThemeHead from '../components/ThemeHead.astro';
+import { SITE_URL } from '../lib/seo';
 import { locales, switchLocalePath, t, type Locale } from '../i18n';
 
 interface Props {
@@ -23,7 +24,7 @@ const {
   alternates = true,
   jsonLd,
 } = Astro.props;
-const site = Astro.site ?? new URL('https://alfonsoramos.dev');
+const site = Astro.site ?? new URL(SITE_URL);
 const absolute = (path: string) => new URL(path, site).href;
 const pathname = Astro.url.pathname;
 const ogLocales: Record<Locale, string> = { en: 'en_US', es: 'es_ES' };
@@ -60,11 +61,7 @@ const ogLocales: Record<Locale, string> = { en: 'en_US', es: 'es_ES' };
             href={absolute(switchLocalePath(pathname, target))}
           />
         ))}
-        <link
-          rel="alternate"
-          hreflang="x-default"
-          href="https://alfonsoramos.dev/"
-        />
+        <link rel="alternate" hreflang="x-default" href={SITE_URL} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Alfonso Ramos Rojas" />
         <meta property="og:title" content={title} />

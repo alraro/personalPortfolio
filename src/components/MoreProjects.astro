@@ -1,0 +1,30 @@
+---
+import { getMoreProjects } from '../lib/catalogue';
+import { t, type Locale } from '../i18n';
+import ProjectCard from './ProjectCard.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const projects = await getMoreProjects(locale);
+---
+
+{projects.length > 0 && (
+  <section
+    aria-labelledby="more-projects"
+    class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16"
+  >
+    <SectionHeading id="more-projects">
+      {t(locale, 'moreProjects.heading')}
+    </SectionHeading>
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => (
+        <li>
+          <ProjectCard project={project} locale={locale} variant="compact" />
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

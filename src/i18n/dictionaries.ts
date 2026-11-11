@@ -13,6 +13,7 @@ export const en = {
   'linkType.paper': 'Paper',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Projects',
+  'moreProjects.heading': 'More projects',
   'ds.title': 'Design system',
   'ds.intro':
     'This page documents the design tokens and base components used across the portfolio. It is for the Owner and contributors, not for Visitors.',
@@ -51,6 +52,10 @@ export const en = {
   'ds.generatedCover': 'GeneratedCover',
   'ds.linkBare': 'Link, bare and icon-only (used inside cards)',
   'ds.projectCard': 'ProjectCard (featured)',
+  'ds.projectCardCompact': 'ProjectCard (compact)',
+  'ds.moreProjectsGrid': 'MoreProjects grid (1, 2 and 3 columns)',
+  'ds.compactMediaNote':
+    'Media is shown as a GeneratedCover until the Project Media component lands.',
   'ds.projectCardMediaRight': 'side="media-right"',
   'ds.projectCardMediaLeft': 'side="media-left"',
   'ds.projectSpine': 'ProjectSpine',
@@ -88,6 +93,7 @@ export const es: Dictionary = {
   'linkType.paper': 'Artículo',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Proyectos',
+  'moreProjects.heading': 'Más proyectos',
   'ds.title': 'Sistema de diseño',
   'ds.intro':
     'Esta página documenta los tokens de diseño y los componentes base del portfolio. Es para el Owner y colaboradores, no para los Visitors.',
@@ -126,6 +132,10 @@ export const es: Dictionary = {
   'ds.generatedCover': 'GeneratedCover',
   'ds.linkBare': 'Link, sin estilo y solo icono (usado dentro de tarjetas)',
   'ds.projectCard': 'ProjectCard (featured)',
+  'ds.projectCardCompact': 'ProjectCard (compacta)',
+  'ds.moreProjectsGrid': 'Cuadrícula de MoreProjects (1, 2 y 3 columnas)',
+  'ds.compactMediaNote':
+    'El medio se muestra como GeneratedCover hasta que llegue el componente de medios del proyecto.',
   'ds.projectCardMediaRight': 'side="media-right"',
   'ds.projectCardMediaLeft': 'side="media-left"',
   'ds.projectSpine': 'ProjectSpine',

@@ -1,0 +1,16 @@
+---
+// Seam between ProjectCard and the Project's Media. Both card variants render
+// their Media through this component. Today it always draws the GeneratedCover;
+// the Project Media ticket (#10) swaps the body for ProjectMedia.
+import type { Project } from '../lib/catalogue/core';
+import GeneratedCover from './GeneratedCover.astro';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+---
+
+<div data-project-media class="min-w-0">
+  <GeneratedCover title={project.cover.title} tagline={project.cover.tagline} />
+</div>

@@ -1,0 +1,129 @@
+---
+import type { Project } from '../lib/catalogue/core';
+import { t, type Locale } from '../i18n';
+import GeneratedCover from './GeneratedCover.astro';
+import Icon from './Icon.astro';
+import Link from './Link.astro';
+import Tag from './Tag.astro';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  variant?: 'featured';
+  /** Which column holds the media on screens >= 768 px. */
+  side?: 'media-right' | 'media-left';
+  class?: string;
+}
+
+const {
+  project,
+  locale,
+  variant = 'featured',
+  side = 'media-right',
+  class: className,
+} = Astro.props;
+
+const linkIcons = {
+  repository: 'Code',
+  website: 'Globe',
+  demo: 'Play',
+  paper: 'FileText',
+} as const;
+
+const linkName = (type: string) =>
+  t(locale, 'project.linkName')
+    .replace('{type}', type)
+    .replace('{title}', project.title);
+---
+
+{/* The title link's ::after covers the whole card (whole-card link). Secondary
+    links sit above it (z-10), so there are no nested anchors. */}
+<article
+  id={`project-${project.slug}`}
+  data-variant={variant}
+  data-side={side}
+  class:list={[
+    'group relative grid grid-cols-1 items-center gap-6 rounded-lg border border-border bg-background p-4 transition-[border-color,transform] duration-(--duration-base) ease-(--ease-standard) focus-within:border-accent hover:border-accent md:grid-cols-2 md:gap-16 md:p-6 md:hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+    className,
+  ]}
+>
+  <div class:list={['min-w-0', side === 'media-right' && 'md:order-2']}>
+    <GeneratedCover
+      title={project.cover.title}
+      tagline={project.cover.tagline}
+    />
+  </div>
+  <div class="flex min-w-0 flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <h3 class="font-display text-3xl leading-(--leading-display) font-semibold tracking-(--tracking-display)">
+        <Link
+          href={project.primaryLink.url}
+          locale={locale}
+          bare
+          iconOnly
+          class="after:absolute after:inset-0 after:content-['']"
+        >
+          {project.title}
+        </Link>
+      </h3>
+      <p class="font-mono text-sm text-text-muted">{project.subtitle}</p>
+    </div>
+    <div class="prose" set:html={project.descriptionHtml} />
+    <ul class="flex flex-wrap gap-2">
+      {project.tags.map((tag) => (
+        <li>
+          <Tag>{tag}</Tag>
+        </li>
+      ))}
+    </ul>
+    {project.secondaryLinks.length > 0 && (
+      <ul class="relative z-10 flex gap-4 text-xl">
+        {project.secondaryLinks.map((link) => (
+          <li>
+            <Link
+              href={link.url}
+              locale={locale}
+              bare
+              iconOnly
+              class="inline-flex text-text-muted transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-accent"
+            >
+              <Icon name={linkIcons[link.type]} />
+              <span class="sr-only">{linkName(link.label)}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</article>
+
+<style>
+  .prose :global(p) {
+    color: var(--color-text);
+    line-height: 1.65;
+  }
+  .prose :global(p + p) {
+    margin-top: 0.75rem;
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0 0.25em;
+  }
+  .prose :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .prose :global(strong) {
+    font-weight: 600;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+</style>

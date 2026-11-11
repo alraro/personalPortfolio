@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isSoftwareRenderer, minFrameGapMs } from './renderer';
+import { isSoftwareRenderer } from './renderer';
 
 describe('isSoftwareRenderer', () => {
   it.each([
@@ -24,17 +24,5 @@ describe('isSoftwareRenderer', () => {
   it('treats an unknown renderer as hardware (the extension may be masked)', () => {
     expect(isSoftwareRenderer(null)).toBe(false);
     expect(isSoftwareRenderer('')).toBe(false);
-  });
-});
-
-describe('minFrameGapMs', () => {
-  it('converts a frame rate to a gap in milliseconds', () => {
-    expect(minFrameGapMs(30)).toBeCloseTo(1000 / 30);
-  });
-
-  it('is 0 (uncapped) for a missing or non-positive rate', () => {
-    expect(minFrameGapMs(undefined)).toBe(0);
-    expect(minFrameGapMs(0)).toBe(0);
-    expect(minFrameGapMs(-5)).toBe(0);
   });
 });

@@ -8,11 +8,6 @@ export function isSoftwareRenderer(name: string | null | undefined): boolean {
   return !!name && SOFTWARE.test(name);
 }
 
-/** Minimum gap between frames for a frame-rate cap; 0 means uncapped. */
-export function minFrameGapMs(maxFps: number | undefined): number {
-  return maxFps && maxFps > 0 ? 1000 / maxFps : 0;
-}
-
 /**
  * Probes a throw-away WebGL2 context: false without WebGL2 or when the
  * renderer is software. Such a device would run the shader on the CPU and

@@ -100,8 +100,6 @@ export default function HeroBackground() {
             colorNum={2}
             pixelSize={3}
             waveSpeed={0.02}
-            dpr={1}
-            maxFps={30}
           />
         </Suspense>
       )}

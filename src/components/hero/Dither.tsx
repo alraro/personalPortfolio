@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties } from 'react';
-import { minFrameGapMs } from './renderer';
 
 export type DitherColor = string | [number, number, number];
 export type DitherMode =
@@ -37,8 +36,6 @@ export interface DitherProps {
   clickRipple?: boolean;
   intro?: boolean;
   dpr?: number;
-  // Local addition: frame-rate cap (frames per second); uncapped when unset.
-  maxFps?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -65,7 +62,6 @@ type Settings = {
   clickRipple: boolean;
   intro: boolean;
   dpr?: number;
-  maxFps?: number;
 };
 
 type TrailPoint = { x: number; y: number; weight: number };
@@ -393,7 +389,6 @@ const Dither = ({
   clickRipple = true,
   intro = true,
   dpr,
-  maxFps,
   className = '',
   style,
 }: DitherProps) => {
@@ -424,7 +419,6 @@ const Dither = ({
     clickRipple,
     intro,
     dpr,
-    maxFps,
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -642,12 +636,6 @@ const Dither = ({
       raf = 0;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
-      // Local addition: skip this display frame while under the fps cap
-      // (`last` stays put, so the animation time step stays correct).
-      if (last && now - last < minFrameGapMs(s.maxFps) - 1) {
-        raf = requestAnimationFrame(frame);
-        return;
-      }
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
       last = now;
       if (!s.disableAnimation && !reduce) state.time += dt;

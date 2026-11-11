@@ -1,0 +1,15 @@
+# TODO(owner): draft copy derived from the public repository README, review before publishing.
+# The last paragraph (what I learned) is inferred from the README; confirm or rewrite it.
+order: 1
+featured: true
+tags:
+  - Kubernetes
+  - ArgoCD
+  - GitOps
+  - Helm
+  - cert-manager
+  - Sealed Secrets
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/kubernetes-cluster-gitops

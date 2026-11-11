@@ -4,8 +4,14 @@ import { expectNoAxeViolations } from './helpers/axe';
 const PRIMARY_LINK = 'https://github.com/alraro/miniRT';
 
 const copy = {
-  en: { subtitle: 'A ray tracer written from scratch in C.' },
-  es: { subtitle: 'Un ray tracer escrito desde cero en C.' },
+  en: {
+    subtitle:
+      'A ray tracer in C that renders 3D scenes from a text description.',
+  },
+  es: {
+    subtitle:
+      'Un ray tracer en C que renderiza escenas 3D a partir de una descripción en texto.',
+  },
 } as const;
 
 for (const locale of ['en', 'es'] as const) {
@@ -63,7 +69,7 @@ for (const locale of ['en', 'es'] as const) {
       test.skip(!isMobile, 'mobile layout');
       await page.goto(`/${locale}/`);
       const media = await page
-        .locator('#project-minirt [data-generated-cover]')
+        .locator('#project-minirt [data-project-media]')
         .boundingBox();
       const title = await page.locator('#project-minirt h3').boundingBox();
       expect(media).not.toBeNull();

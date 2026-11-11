@@ -1,0 +1,42 @@
+---
+// Must be the first thing in <head> after charset/viewport, before any stylesheet,
+// so the theme is set before first paint (no flash of the wrong theme).
+import { THEME_STORAGE_KEY, themeColors } from '../lib/theme';
+---
+
+<meta
+  name="theme-color"
+  content={themeColors.dark}
+  media="(prefers-color-scheme: dark)"
+/>
+<meta
+  name="theme-color"
+  content={themeColors.light}
+  media="(prefers-color-scheme: light)"
+/>
+<script is:inline define:vars={{ key: THEME_STORAGE_KEY, colors: themeColors }}>
+  (function () {
+    const root = document.documentElement;
+    const query = matchMedia('(prefers-color-scheme: light)');
+    function stored() {
+      try {
+        const value = localStorage.getItem(key);
+        return value === 'light' || value === 'dark' ? value : null;
+      } catch {
+        return null;
+      }
+    }
+    function apply(theme) {
+      root.dataset.theme = theme;
+      const metas = document.querySelectorAll('meta[name="theme-color"]');
+      for (let i = 0; i < metas.length; i++) {
+        metas[i].setAttribute('content', colors[theme]);
+      }
+    }
+    apply(stored() || (query.matches ? 'light' : 'dark'));
+    // Without a stored choice, keep following the system preference.
+    query.addEventListener('change', function (event) {
+      if (!stored()) apply(event.matches ? 'light' : 'dark');
+    });
+  })();
+</script>

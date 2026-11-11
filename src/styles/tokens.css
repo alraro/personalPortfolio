@@ -1,0 +1,105 @@
+/*
+ * Design tokens. Components use these through Tailwind utilities
+ * (bg-background, text-text-muted, rounded-md, shadow-sm, font-display...)
+ * and never raw palette values. Source: "Hero decision" on issue #7.
+ * Dark is the default; <html data-theme="light"> overrides the colours.
+ * Contrast ratios are WCAG 2.2 ratios and are enforced by tokens.test.ts.
+ */
+
+@theme {
+  /* Drop Tailwind's raw palette so only semantic colours exist. */
+  --color-*: initial;
+
+  /* Dark theme (default). Ratios: text/bg 17.1, text/surface 15.9,
+     text-muted/bg 7.1, text-muted/surface 6.6, accent/bg 9.8,
+     accent/surface 9.1, accent-contrast/accent 9.8, focus-ring/bg 9.8. */
+  --color-background: #0d0c0a;
+  --color-surface: #171512;
+  --color-surface-raised: #211e19;
+  --color-text: #f4efe6;
+  --color-text-muted: #a39b8c;
+  --color-border: #3a352c;
+  --color-accent: #f2a93b;
+  --color-accent-contrast: #0d0c0a;
+  --color-focus-ring: #f2a93b;
+
+  /* Typography */
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-body:
+    'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Fluid type scale, xs to 6xl (viewport 20rem to 80rem). */
+  --text-xs: clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.07rem + 0.28vw, 1.3125rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.625rem);
+  --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.9vw, 2.875rem);
+  --text-4xl: clamp(2.25rem, 1.7rem + 2.7vw, 3.75rem);
+  --text-5xl: clamp(2.75rem, 1.9rem + 4.2vw, 5rem);
+  --text-6xl: clamp(3.25rem, 2rem + 6.2vw, 6.5rem);
+
+  --leading-display: 1.05;
+  --tracking-display: -0.02em;
+
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+
+  /* Shadows (colour follows the theme through --shadow-color) */
+  --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+  --shadow-md: 0 6px 16px -4px var(--shadow-color);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 500ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root {
+  --shadow-color: rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}
+
+/* Light theme. Ratios: text/bg 16.4, text/surface 16.0, text-muted/bg 5.5,
+   text-muted/surface 5.4, accent/bg 4.7, accent/surface 4.5,
+   accent-contrast/accent 5.0, focus-ring/bg 4.7. */
+:root[data-theme='light'] {
+  --color-background: #faf6ef;
+  --color-surface: #f8f3ea;
+  --color-surface-raised: #ffffff;
+  --color-text: #1b1813;
+  --color-text-muted: #6b6355;
+  --color-border: #cfc5b2;
+  --color-accent: #b45309;
+  --color-accent-contrast: #ffffff;
+  --color-focus-ring: #b45309;
+  --shadow-color: rgb(27 24 19 / 0.18);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Reduced motion: every duration collapses to (effectively) zero. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

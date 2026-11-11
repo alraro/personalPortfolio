@@ -1,0 +1,397 @@
+---
+import Button from '../../components/Button.astro';
+import Icon from '../../components/Icon.astro';
+import LanguageSwitch from '../../components/LanguageSwitch.astro';
+import Link from '../../components/Link.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import Tag from '../../components/Tag.astro';
+import ThemeToggle from '../../components/ThemeToggle.astro';
+import LocaleLayout from '../../layouts/LocaleLayout.astro';
+import { locales, t, type Locale } from '../../i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = Astro.params.locale as Locale;
+
+// Class names are written out in full so Tailwind can see them.
+const colorTokens = [
+  { name: 'background', swatch: 'bg-background' },
+  { name: 'surface', swatch: 'bg-surface' },
+  { name: 'surface-raised', swatch: 'bg-surface-raised' },
+  { name: 'text', swatch: 'bg-text' },
+  { name: 'text-muted', swatch: 'bg-text-muted' },
+  { name: 'border', swatch: 'bg-border' },
+  { name: 'accent', swatch: 'bg-accent' },
+  { name: 'accent-contrast', swatch: 'bg-accent-contrast' },
+  { name: 'focus-ring', swatch: 'bg-focus-ring' },
+];
+const families = [
+  { name: 'display', cls: 'font-display' },
+  { name: 'body', cls: 'font-body' },
+  { name: 'mono', cls: 'font-mono' },
+];
+const scale = [
+  { name: 'xs', cls: 'text-xs' },
+  { name: 'sm', cls: 'text-sm' },
+  { name: 'base', cls: 'text-base' },
+  { name: 'lg', cls: 'text-lg' },
+  { name: 'xl', cls: 'text-xl' },
+  { name: '2xl', cls: 'text-2xl' },
+  { name: '3xl', cls: 'text-3xl' },
+  { name: '4xl', cls: 'text-4xl' },
+  { name: '5xl', cls: 'text-5xl' },
+  { name: '6xl', cls: 'text-6xl' },
+];
+const radii = [
+  { name: 'sm', cls: 'rounded-sm' },
+  { name: 'md', cls: 'rounded-md' },
+  { name: 'lg', cls: 'rounded-lg' },
+];
+const shadows = [
+  { name: 'sm', cls: 'shadow-sm' },
+  { name: 'md', cls: 'shadow-md' },
+];
+const durations = [
+  { name: 'fast', cls: 'duration-(--duration-fast)' },
+  { name: 'base', cls: 'duration-(--duration-base)' },
+  { name: 'slow', cls: 'duration-(--duration-slow)' },
+];
+const variants = [
+  { variant: 'primary', label: t(locale, 'ds.primary') },
+  { variant: 'secondary', label: t(locale, 'ds.secondary') },
+  { variant: 'ghost', label: t(locale, 'ds.ghost') },
+] as const;
+const sizes = ['sm', 'md'] as const;
+
+const card = 'rounded-lg border border-border bg-surface p-5';
+---
+
+<LocaleLayout
+  locale={locale}
+  title={`${t(locale, 'ds.title')} | Alfonso Ramos Rojas`}
+  description={t(locale, 'ds.intro')}
+  noindex
+>
+  <header class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 pt-6">
+    <LanguageSwitch locale={locale} />
+    <ThemeToggle locale={locale} />
+  </header>
+
+  <main class="mx-auto flex max-w-5xl flex-col gap-16 px-4 pt-10 pb-24">
+    <div class="flex flex-col gap-4">
+      <h1 class="font-display text-5xl leading-(--leading-display) font-semibold tracking-(--tracking-display)">
+        {t(locale, 'ds.title')}
+      </h1>
+      <p class="max-w-prose text-lg text-text-muted">{t(locale, 'ds.intro')}</p>
+    </div>
+
+    <section aria-labelledby="ds-colors" class="flex flex-col gap-6">
+      <SectionHeading id="ds-colors" eyebrow="01">
+        {t(locale, 'ds.colors')}
+      </SectionHeading>
+      <p class="text-text-muted">{t(locale, 'ds.colorsNote')}</p>
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {colorTokens.map((token) => (
+          <li class="flex items-center gap-4 rounded-lg border border-border bg-surface p-3">
+            <span
+              aria-hidden="true"
+              class:list={[
+                'size-14 shrink-0 rounded-md border border-border',
+                token.swatch,
+              ]}
+            />
+            <span class="flex flex-col">
+              <code class="font-mono text-sm">{token.name}</code>
+              <code
+                class="font-mono text-xs text-text-muted"
+                data-token-value={`--color-${token.name}`}
+              ></code>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="ds-typography" class="flex flex-col gap-6">
+      <SectionHeading id="ds-typography" eyebrow="02">
+        {t(locale, 'ds.typography')}
+      </SectionHeading>
+      <h3 class="font-mono text-sm text-text-muted">
+        {t(locale, 'ds.families')}
+      </h3>
+      <ul class="flex flex-col gap-3">
+        {families.map((family) => (
+          <li class={card}>
+            <code class="font-mono text-sm text-text-muted">
+              font-{family.name}
+            </code>
+            <p class:list={[family.cls, 'text-3xl']}>
+              {t(locale, 'ds.sample')}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <h3 class="font-mono text-sm text-text-muted">{t(locale, 'ds.scale')}</h3>
+      <ul class="flex flex-col gap-3">
+        {scale.map((step) => (
+          <li class="flex flex-col gap-1 border-b border-border pb-3">
+            <code class="font-mono text-xs text-text-muted">
+              text-{step.name}
+            </code>
+            <p
+              class:list={[
+                step.cls,
+                'font-display leading-(--leading-display) tracking-(--tracking-display)',
+              ]}
+            >
+              {t(locale, 'ds.sample')}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="ds-radii" class="flex flex-col gap-6">
+      <SectionHeading id="ds-radii" eyebrow="03">
+        {t(locale, 'ds.radii')}
+      </SectionHeading>
+      <ul class="flex flex-wrap gap-6">
+        {radii.map((radius) => (
+          <li class="flex flex-col items-center gap-2">
+            <span
+              aria-hidden="true"
+              class:list={[
+                'size-20 border border-border bg-surface-raised',
+                radius.cls,
+              ]}
+            />
+            <code class="font-mono text-sm">rounded-{radius.name}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="ds-shadows" class="flex flex-col gap-6">
+      <SectionHeading id="ds-shadows" eyebrow="04">
+        {t(locale, 'ds.shadows')}
+      </SectionHeading>
+      <ul class="flex flex-wrap gap-8">
+        {shadows.map((shadow) => (
+          <li class="flex flex-col items-center gap-3">
+            <span
+              aria-hidden="true"
+              class:list={['size-20 rounded-md bg-surface-raised', shadow.cls]}
+            />
+            <code class="font-mono text-sm">shadow-{shadow.name}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="ds-motion" class="flex flex-col gap-6">
+      <SectionHeading id="ds-motion" eyebrow="05">
+        {t(locale, 'ds.motion')}
+      </SectionHeading>
+      <p class="text-text-muted">{t(locale, 'ds.motionNote')}</p>
+      <div class:list={[card, 'flex flex-col gap-4']} data-motion-demo>
+        <ul class="flex flex-col gap-3">
+          {durations.map((duration) => (
+            <li class="flex items-center gap-4">
+              <code class="w-28 shrink-0 font-mono text-sm">
+                {duration.name}
+              </code>
+              <span class="relative block h-3 flex-1 rounded-sm bg-surface-raised">
+                <span
+                  aria-hidden="true"
+                  data-motion-dot
+                  class:list={[
+                    'absolute top-0 left-0 size-3 rounded-sm bg-accent transition-transform ease-(--ease-standard)',
+                    duration.cls,
+                  ]}
+                />
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div>
+          <Button variant="secondary" size="sm" icon="Play" data-motion-play>
+            {t(locale, 'ds.motionPlay')}
+          </Button>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="ds-components" class="flex flex-col gap-8">
+      <SectionHeading id="ds-components" eyebrow="06">
+        {t(locale, 'ds.components')}
+      </SectionHeading>
+      <p class="rounded-md border border-accent bg-surface p-4 font-mono text-sm">
+        {t(locale, 'ds.componentsNote')}
+      </p>
+      <p class="text-text-muted">{t(locale, 'ds.focusNote')}</p>
+
+      <div class:list={[card, 'flex flex-col gap-5']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.button')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.buttonAsLink')}</p>
+        <div class="flex flex-col gap-3">
+          {sizes.map((size) => (
+            <div class="flex flex-wrap items-center gap-3">
+              <code class="w-10 font-mono text-xs text-text-muted">{size}</code>
+              {variants.map(({ variant, label }) => (
+                <Button variant={variant} size={size} href={`/${locale}/`}>
+                  {label}
+                </Button>
+              ))}
+              {variants.map(({ variant, label }) => (
+                <Button
+                  variant={variant}
+                  size={size}
+                  href={`/${locale}/`}
+                  icon="ArrowRight"
+                >
+                  {label} ({t(locale, 'ds.withIcon')})
+                </Button>
+              ))}
+            </div>
+          ))}
+        </div>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.buttonAsButton')}</p>
+        <div class="flex flex-col gap-3">
+          {sizes.map((size) => (
+            <div class="flex flex-wrap items-center gap-3">
+              <code class="w-10 font-mono text-xs text-text-muted">{size}</code>
+              {variants.map(({ variant, label }) => (
+                <Button variant={variant} size={size}>
+                  {label}
+                </Button>
+              ))}
+              {variants.map(({ variant, label }) => (
+                <Button variant={variant} size={size} icon="Download">
+                  {label} ({t(locale, 'ds.withIcon')})
+                </Button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.link')}
+        </h3>
+        <p>
+          <Link href={`/${locale}/`} locale={locale} data-demo="internal-link">
+            {t(locale, 'ds.linkInternal')}
+          </Link>
+        </p>
+        <p>
+          <Link href="https://github.com/alraro" locale={locale}>
+            {t(locale, 'ds.linkExternal')}
+          </Link>
+        </p>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.icon')}
+        </h3>
+        <p class="text-sm text-text-muted">{t(locale, 'ds.iconNote')}</p>
+        <ul class="flex flex-wrap items-center gap-6 text-3xl">
+          <li>
+            <Icon name="Sun" />
+          </li>
+          <li>
+            <Icon name="Moon" />
+          </li>
+          <li>
+            <Icon name="ExternalLink" />
+          </li>
+          <li>
+            <Icon
+              source="simple"
+              name="Github"
+              label={t(locale, 'ds.iconLabelled')}
+            />
+          </li>
+        </ul>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.tag')}
+        </h3>
+        <ul class="flex flex-wrap gap-2">
+          <li>
+            <Tag>Astro</Tag>
+          </li>
+          <li>
+            <Tag>TypeScript</Tag>
+          </li>
+          <li>
+            <Tag>Tailwind CSS</Tag>
+          </li>
+        </ul>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.sectionHeading')}
+        </h3>
+        <SectionHeading id="ds-heading-sample" eyebrow="01">
+          {t(locale, 'ds.sectionHeadingSample')}
+        </SectionHeading>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.themeToggle')}
+        </h3>
+        <div>
+          <ThemeToggle locale={locale} />
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.languageSwitch')}
+        </h3>
+        <div>
+          <LanguageSwitch locale={locale} />
+        </div>
+      </div>
+    </section>
+  </main>
+</LocaleLayout>
+
+<script>
+  function showTokenValues() {
+    const style = getComputedStyle(document.documentElement);
+    document
+      .querySelectorAll<HTMLElement>('[data-token-value]')
+      .forEach((el) => {
+        el.textContent = style
+          .getPropertyValue(el.dataset.tokenValue ?? '')
+          .trim();
+      });
+  }
+  showTokenValues();
+  new MutationObserver(showTokenValues).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+
+  const demo = document.querySelector('[data-motion-demo]');
+  let moved = false;
+  demo?.querySelector('[data-motion-play]')?.addEventListener('click', () => {
+    moved = !moved;
+    demo.querySelectorAll<HTMLElement>('[data-motion-dot]').forEach((dot) => {
+      const track = dot.parentElement;
+      const distance = (track?.clientWidth ?? 0) - dot.clientWidth;
+      dot.style.transform = moved ? `translateX(${distance}px)` : '';
+    });
+  });
+</script>

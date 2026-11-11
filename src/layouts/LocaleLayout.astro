@@ -1,0 +1,39 @@
+---
+import '../styles/global.css';
+import { locales, switchLocalePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+}
+
+const { locale, title } = Astro.props;
+const site = Astro.site ?? new URL('https://alfonsoramos.dev');
+const absolute = (path: string) => new URL(path, site).href;
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="canonical" href={absolute(pathname)} />
+    {locales.map((target) => (
+      <link
+        rel="alternate"
+        hreflang={target}
+        href={absolute(switchLocalePath(pathname, target))}
+      />
+    ))}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://alfonsoramos.dev/"
+    />
+  </head>
+  <body class="min-h-screen bg-neutral-950 text-neutral-100">
+    <slot />
+  </body>
+</html>

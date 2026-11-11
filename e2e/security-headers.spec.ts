@@ -8,6 +8,12 @@ const previewUrl = process.env.PREVIEW_URL;
 test.describe('security and caching headers on the deployed preview', () => {
   test.skip(!previewUrl, 'PREVIEW_URL is not set (deployed preview only)');
 
+  test('the root URL answers with a real 302 to /en/', async ({ request }) => {
+    const response = await request.get(`${previewUrl}/`, { maxRedirects: 0 });
+    expect(response.status()).toBe(302);
+    expect(response.headers()['location']).toMatch(/\/en\/$/);
+  });
+
   test('home page sends the security headers and a strict CSP', async ({
     request,
   }) => {

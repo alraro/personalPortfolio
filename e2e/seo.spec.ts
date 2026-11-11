@@ -49,7 +49,7 @@ for (const locale of ['en', 'es'] as const) {
       expect(alternates).toEqual([
         ['en', `${SITE}/en/`],
         ['es', `${SITE}/es/`],
-        ['x-default', `${SITE}/`],
+        ['x-default', `${SITE}/en/`],
       ]);
     });
 

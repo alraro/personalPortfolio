@@ -24,7 +24,6 @@ const items = locales.map((target) => ({
           hreflang={item.target}
           lang={item.target}
           aria-current={item.current ? 'true' : undefined}
-          data-lang-choice={item.target}
           class="rounded-sm px-1 font-mono text-sm text-text-muted underline-offset-4 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-text hover:underline aria-[current=true]:font-semibold aria-[current=true]:text-accent"
         >
           <span aria-hidden="true">{item.short}</span>
@@ -34,19 +33,3 @@ const items = locales.map((target) => ({
     ))}
   </ul>
 </nav>
-
-<script>
-  import { LANG_STORAGE_KEY } from '../i18n/locale';
-
-  document
-    .querySelectorAll<HTMLAnchorElement>('a[data-lang-choice]')
-    .forEach((link) => {
-      link.addEventListener('click', () => {
-        try {
-          localStorage.setItem(LANG_STORAGE_KEY, link.dataset.langChoice ?? '');
-        } catch {
-          // Storage may be unavailable; the switch still navigates.
-        }
-      });
-    });
-</script>

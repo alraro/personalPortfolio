@@ -2,6 +2,7 @@
 import About from '../../components/About.astro';
 import FeaturedProjects from '../../components/FeaturedProjects.astro';
 import Hero from '../../components/Hero.astro';
+import MoreProjects from '../../components/MoreProjects.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
 import { locales, t, type Locale } from '../../i18n';
@@ -27,5 +28,6 @@ const profile = await getProfile(locale);
     <Hero locale={locale} profile={profile} />
     <About locale={locale} html={profile.aboutHtml} />
     <FeaturedProjects locale={locale} />
+    <MoreProjects locale={locale} />
   </main>
 </LocaleLayout>

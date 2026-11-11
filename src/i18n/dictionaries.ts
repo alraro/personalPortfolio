@@ -30,6 +30,7 @@ export const en = {
   'ds.photo': 'Photo treatment',
   'ds.photoNote':
     'Duotone made from the photo-shadow and photo-highlight tokens, so it adapts to the theme.',
+  'moreProjects.heading': 'More projects',
   'ds.title': 'Design system',
   'ds.intro':
     'This page documents the design tokens and base components used across the portfolio. It is for the Owner and contributors, not for Visitors.',
@@ -68,6 +69,10 @@ export const en = {
   'ds.generatedCover': 'GeneratedCover',
   'ds.linkBare': 'Link, bare and icon-only (used inside cards)',
   'ds.projectCard': 'ProjectCard (featured)',
+  'ds.projectCardCompact': 'ProjectCard (compact)',
+  'ds.moreProjectsGrid': 'MoreProjects grid (1, 2 and 3 columns)',
+  'ds.compactMediaNote':
+    'Media is shown as a GeneratedCover until the Project Media component lands.',
   'ds.projectCardMediaRight': 'side="media-right"',
   'ds.projectCardMediaLeft': 'side="media-left"',
   'ds.projectSpine': 'ProjectSpine',
@@ -122,6 +127,7 @@ export const es: Dictionary = {
   'ds.photo': 'Tratamiento de la foto',
   'ds.photoNote':
     'Duotono hecho con los tokens photo-shadow y photo-highlight, así se adapta al tema.',
+  'moreProjects.heading': 'Más proyectos',
   'ds.title': 'Sistema de diseño',
   'ds.intro':
     'Esta página documenta los tokens de diseño y los componentes base del portfolio. Es para el Owner y colaboradores, no para los Visitors.',
@@ -160,6 +166,10 @@ export const es: Dictionary = {
   'ds.generatedCover': 'GeneratedCover',
   'ds.linkBare': 'Link, sin estilo y solo icono (usado dentro de tarjetas)',
   'ds.projectCard': 'ProjectCard (featured)',
+  'ds.projectCardCompact': 'ProjectCard (compacta)',
+  'ds.moreProjectsGrid': 'Cuadrícula de MoreProjects (1, 2 y 3 columnas)',
+  'ds.compactMediaNote':
+    'El medio se muestra como GeneratedCover hasta que llegue el componente de medios del proyecto.',
   'ds.projectCardMediaRight': 'side="media-right"',
   'ds.projectCardMediaLeft': 'side="media-left"',
   'ds.projectSpine': 'ProjectSpine',

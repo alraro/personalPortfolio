@@ -35,9 +35,58 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  lighthouse:
+    name: Lighthouse
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Lighthouse (mobile)
+        run: AUDIT_PRESET=mobile pnpm exec lhci autorun
+      - name: Lighthouse (desktop)
+        if: ${{ !cancelled() }}
+        run: AUDIT_PRESET=desktop pnpm exec lhci autorun
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: lighthouse-reports
+          path: lhci-reports
+          if-no-files-found: warn
+          retention-days: 14
+
+  links:
+    name: Links
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}
+          restore-keys: lychee-
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml --root-dir "${{ github.workspace }}/dist" './dist/**/*.html'
+          fail: true
+
   deploy:
     name: Deploy to Cloudflare Pages
-    needs: ci
+    needs: [ci, lighthouse, links]
     runs-on: ubuntu-latest
     # Fork PRs get no secrets; skip them.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository

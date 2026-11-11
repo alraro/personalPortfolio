@@ -1,0 +1,19 @@
+# lychee broken-link check config.
+
+# Check internal and external links; retry flaky requests.
+max_retries = 2
+timeout = 20
+
+# 200-299 are success; 429 (rate limited) is not a broken link.
+accept = ["200..=299", "429"]
+
+# Cache results between runs to avoid rate limits (the workflow persists .lycheecache).
+cache = true
+max_cache_age = "1d"
+
+exclude = [
+  # mailto: links cannot be checked over HTTP.
+  '^mailto:',
+  # linkedin.com blocks bots with HTTP 999.
+  '^https?://([a-z0-9-]+\.)*linkedin\.com',
+]

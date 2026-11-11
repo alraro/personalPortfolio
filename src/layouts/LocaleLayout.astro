@@ -3,7 +3,13 @@ import '../styles/global.css';
 import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
 import ThemeHead from '../components/ThemeHead.astro';
 import { SITE_URL } from '../lib/seo';
-import { locales, switchLocalePath, t, type Locale } from '../i18n';
+import {
+  defaultLocale,
+  locales,
+  switchLocalePath,
+  t,
+  type Locale,
+} from '../i18n';
 
 interface Props {
   locale: Locale;
@@ -61,7 +67,11 @@ const ogLocales: Record<Locale, string> = { en: 'en_US', es: 'es_ES' };
             href={absolute(switchLocalePath(pathname, target))}
           />
         ))}
-        <link rel="alternate" hreflang="x-default" href={SITE_URL} />
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={absolute(`/${defaultLocale}/`)}
+        />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Alfonso Ramos Rojas" />
         <meta property="og:title" content={title} />

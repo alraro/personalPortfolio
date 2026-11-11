@@ -1,47 +1,23 @@
 import { expect, test } from '@playwright/test';
 import { expectNoAxeViolations } from './helpers/axe';
 
-test.describe('root language detection', () => {
-  test.describe('browser locale es-ES', () => {
-    test.use({ locale: 'es-ES' });
-    test('ends on /es/', async ({ page }) => {
-      await page.goto('/');
-      await expect(page).toHaveURL(/\/es\/$/);
+test.describe('root redirect', () => {
+  for (const locale of ['es-ES', 'de-DE']) {
+    test.describe(`browser locale ${locale}`, () => {
+      test.use({ locale });
+      test('ends on /en/ whatever the browser language', async ({ page }) => {
+        await page.goto('/');
+        await expect(page).toHaveURL(/\/en\/$/);
+      });
     });
-
-    test('a stored choice wins over the browser language', async ({ page }) => {
-      await page.goto('/es/');
-      await page.getByRole('link', { name: 'English' }).click();
-      await expect(page).toHaveURL(/\/en\/$/);
-      await page.goto('/');
-      await expect(page).toHaveURL(/\/en\/$/);
-    });
-  });
-
-  test.describe('browser locale de-DE', () => {
-    test.use({ locale: 'de-DE' });
-    test('ends on /en/', async ({ page }) => {
-      await page.goto('/');
-      await expect(page).toHaveURL(/\/en\/$/);
-    });
-  });
+  }
 
   test.describe('JavaScript disabled', () => {
-    test.use({ javaScriptEnabled: false, locale: 'es-ES' });
-    test('ends on /en/ through the noscript refresh', async ({ page }) => {
+    test.use({ javaScriptEnabled: false });
+    test('ends on /en/ without scripts', async ({ page }) => {
       await page.goto('/');
       await expect(page).toHaveURL(/\/en\/$/);
     });
-  });
-
-  test('root page is noindex and offers both language links', async ({
-    page,
-  }) => {
-    const response = await page.request.get('/');
-    const html = await response.text();
-    expect(html).toContain('<meta name="robots" content="noindex"');
-    expect(html).toContain('English');
-    expect(html).toContain('Español');
   });
 });
 
@@ -73,7 +49,7 @@ for (const locale of ['en', 'es'] as const) {
         'https://alfonsoramos.dev/es/',
       );
       expect(await href('link[rel=alternate][hreflang=x-default]')).toBe(
-        'https://alfonsoramos.dev/',
+        'https://alfonsoramos.dev/en/',
       );
     });
 

@@ -89,6 +89,13 @@ export type ProjectMedia =
     }
   | GeneratedCover;
 
+/** Award a Project inherits from the Event it was built at. */
+export interface ProjectAward {
+  /** For example "2nd place". */
+  text: string;
+  eventName: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -98,6 +105,8 @@ export interface Project {
   primaryLink: ProjectLink;
   secondaryLinks: ProjectLink[];
   media: ProjectMedia;
+  /** Inherited from the Event that references this Project. */
+  award?: ProjectAward;
 }
 
 export interface ProjectLists {
@@ -259,7 +268,11 @@ function toMedia(meta: ProjectMeta, text: ProjectText): ProjectMedia {
   };
 }
 
-function toProject(meta: ProjectMeta, text: ProjectText): Project {
+function toProject(
+  meta: ProjectMeta,
+  text: ProjectText,
+  award: ProjectAward | undefined,
+): Project {
   return {
     slug: meta.slug,
     title: text.title,
@@ -271,6 +284,7 @@ function toProject(meta: ProjectMeta, text: ProjectText): Project {
       toLink(link, text.locale),
     ),
     media: toMedia(meta, text),
+    ...(award ? { award } : {}),
   };
 }
 
@@ -287,8 +301,10 @@ export function buildProjectLists(input: {
   locale: Locale;
   /** Reports video file sizes; the adapter reads them from `public/`. */
   fileSize?: FileSize;
+  /** Award per Project slug, from `buildEvents` in `./events.ts`. */
+  awards?: ReadonlyMap<string, ProjectAward>;
 }): ProjectLists {
-  const { metas, texts, locale, fileSize = () => undefined } = input;
+  const { metas, texts, locale, fileSize = () => undefined, awards } = input;
   const problems = [
     ...validateProjects(metas, texts),
     ...validateMedia(metas, texts, fileSize),
@@ -302,7 +318,10 @@ export function buildProjectLists(input: {
         (candidate) =>
           candidate.slug === meta.slug && candidate.locale === locale,
       )!;
-      return { featured: meta.featured, project: toProject(meta, text) };
+      return {
+        featured: meta.featured,
+        project: toProject(meta, text, awards?.get(meta.slug)),
+      };
     });
 
   return {

@@ -1,5 +1,6 @@
 ---
 import { isExternalHref } from '../lib/links';
+import { SITE_URL } from '../lib/seo';
 import { t, type Locale } from '../i18n';
 import Icon from './Icon.astro';
 
@@ -22,7 +23,7 @@ const {
   class: className,
   ...rest
 } = Astro.props;
-const site = Astro.site?.href ?? 'https://alfonsoramos.dev';
+const site = Astro.site?.href ?? SITE_URL;
 const external = isExternalHref(href, site);
 ---
 

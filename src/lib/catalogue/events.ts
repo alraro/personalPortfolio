@@ -7,7 +7,12 @@
  * Throws the same `ContentError`, listing every problem found.
  */
 import { locales, t, type DictionaryKey, type Locale } from '../../i18n';
-import { ContentError, type ProjectAward } from './core';
+import {
+  ContentError,
+  findText,
+  stripHtmlComments,
+  type ProjectAward,
+} from './core';
 
 export const EVENT_ROLES = ['participant', 'volunteer'] as const;
 export type EventRole = (typeof EVENT_ROLES)[number];
@@ -106,10 +111,7 @@ function validateEvents(
   for (const meta of metas) {
     const found = locales.map((locale) => ({
       locale,
-      text: texts.find(
-        (candidate) =>
-          candidate.slug === meta.slug && candidate.locale === locale,
-      ),
+      text: findText(texts, meta.slug, locale),
     }));
     for (const { locale, text } of found) {
       if (!text) {
@@ -173,11 +175,8 @@ export function buildEvents(input: {
       (a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug),
     )
     .map((meta): EventView => {
-      const text = texts.find(
-        (candidate) =>
-          candidate.slug === meta.slug && candidate.locale === locale,
-      )!;
-      const note = text.body.trim();
+      const text = findText(texts, meta.slug, locale)!;
+      const note = stripHtmlComments(text.body).trim();
       const project = projects.find((p) => p.slug === meta.project);
       if (project && text.award !== undefined) {
         awards.set(project.slug, { text: text.award, eventName: text.name });

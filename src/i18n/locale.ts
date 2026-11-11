@@ -4,7 +4,7 @@ export const defaultLocale: Locale = 'en';
 export const LANG_STORAGE_KEY = 'lang';
 
 function isLocale(value: string | null): value is Locale {
-  return value === 'en' || value === 'es';
+  return locales.some((locale) => locale === value);
 }
 
 /**
@@ -20,12 +20,13 @@ export function decideLocale(
   if (isLocale(stored)) return stored;
   for (const language of browserLanguages) {
     const primary = language.toLowerCase().split('-')[0] ?? '';
-    if (primary === 'es' || primary === 'en') return primary;
+    if (isLocale(primary)) return primary;
   }
   return defaultLocale;
 }
 
 /** Same page in another locale: swaps the first path segment (`/en/x/` -> `/es/x/`). */
 export function switchLocalePath(pathname: string, target: Locale): string {
-  return pathname.replace(/^\/(?:en|es)(?=\/|$)/, `/${target}`);
+  const prefix = new RegExp(`^/(?:${locales.join('|')})(?=/|$)`);
+  return pathname.replace(prefix, `/${target}`);
 }

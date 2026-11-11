@@ -1,7 +1,6 @@
 import type { Locale } from './locale';
 
 export const en = {
-  'home.comingSoon': 'Portfolio coming soon.',
   'meta.description':
     'Software engineering student at the University of Málaga, research assistant at Mobilenet and student at 42 Málaga. Projects in systems, DevOps and more.',
   'meta.title.home': 'Alfonso Ramos Rojas — Software Engineering Student',
@@ -147,7 +146,6 @@ export type Dictionary = Record<DictionaryKey, string>;
 
 // Typed against the keys of `en`: a missing or extra key fails `pnpm build`.
 export const es: Dictionary = {
-  'home.comingSoon': 'Portfolio próximamente.',
   'meta.description':
     'Estudiante de Ingeniería del Software en la Universidad de Málaga, investigador en Mobilenet y alumno de 42 Málaga. Proyectos de sistemas, DevOps y más.',
   'meta.title.home':

@@ -56,7 +56,7 @@ export const en = {
   'ds.about': 'About',
   'ds.photo': 'Photo treatment',
   'ds.photoNote':
-    'Duotone made from the photo-shadow and photo-highlight tokens, so it adapts to the theme.',
+    'The profile photo in natural colour in both themes: no filter, blend or overlay is applied.',
   'experience.heading': 'Experience & Education',
   'experience.experience': 'Experience',
   'experience.education': 'Education',
@@ -205,7 +205,7 @@ export const es: Dictionary = {
   'ds.about': 'About',
   'ds.photo': 'Tratamiento de la foto',
   'ds.photoNote':
-    'Duotono hecho con los tokens photo-shadow y photo-highlight, así se adapta al tema.',
+    'La foto de perfil en su color natural en ambos temas: no se aplica ningún filtro, mezcla ni capa.',
   'experience.heading': 'Experiencia y formación',
   'experience.experience': 'Experiencia',
   'experience.education': 'Formación',

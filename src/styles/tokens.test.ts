@@ -92,13 +92,14 @@ it('uses the L3 light palette chosen by the Owner', () => {
 });
 
 it('shows the photo in natural colour in both themes', () => {
-  // Owner choice: no duotone in either theme (light L3, dark option 3).
-  for (const theme of [css, block(":root[data-theme='light']")]) {
-    expect(theme).toMatch(/--photo-filter:\s*none/);
-    expect(theme).toMatch(/--photo-blend:\s*normal/);
-    expect(theme).toMatch(/--photo-overlay:\s*none/);
-  }
-  expect(css).not.toMatch(/--photo-blend:\s*multiply/);
+  // Owner choice: no duotone in either theme (light L3, dark option 3), so no
+  // photo tokens exist and the component applies no filter, blend or overlay.
+  expect(css).not.toMatch(/--photo-|--color-photo-/);
+  const photo = readFileSync(
+    new URL('../components/ProfilePhoto.astro', import.meta.url),
+    'utf8',
+  );
+  expect(photo).not.toMatch(/filter|mix-blend-mode|::before|::after|<style>/);
   expect(block(":root[data-theme='light']")).toMatch(
     /--dither-opacity:\s*0\.12/,
   );

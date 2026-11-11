@@ -1,12 +1,14 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import Icon from './Icon.astro';
 
-interface Props {
+interface Props extends Omit<HTMLAttributes<'a'>, 'class'> {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md';
   href?: string;
-  /** Lucide icon name shown before the label. */
+  /** Icon name shown before the label (Lucide unless `iconSource` says otherwise). */
   icon?: string;
+  iconSource?: 'lucide' | 'simple' | 'custom';
   type?: 'button' | 'submit' | 'reset';
   class?: string;
 }
@@ -16,6 +18,7 @@ const {
   size = 'md',
   href,
   icon,
+  iconSource,
   type = 'button',
   class: className,
   ...rest
@@ -43,12 +46,12 @@ const classes = [
 
 {href ? (
   <a href={href} data-button={variant} class:list={classes} {...rest}>
-    {icon && <Icon name={icon} />}
+    {icon && <Icon source={iconSource} name={icon} />}
     <slot />
   </a>
 ) : (
   <button type={type} data-button={variant} class:list={classes} {...rest}>
-    {icon && <Icon name={icon} />}
+    {icon && <Icon source={iconSource} name={icon} />}
     <slot />
   </button>
 )}

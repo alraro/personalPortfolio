@@ -1,0 +1,133 @@
+---
+import { encodeEmail } from '../lib/email';
+import { t, type Locale } from '../i18n';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  locale: Locale;
+  github: string;
+  linkedin: string;
+  email: string;
+  class?: string;
+}
+
+const { locale, github, linkedin, email, class: className } = Astro.props;
+
+// The address never appears as plain text in the HTML: only this encoding.
+const encoded = encodeEmail(email);
+const links = [
+  { key: 'contact.github', href: github, icon: 'Github', source: 'simple' },
+  {
+    key: 'contact.linkedin',
+    href: linkedin,
+    icon: 'Linkedin',
+    source: 'custom',
+  },
+] as const;
+---
+
+<div
+  data-contact-links
+  class:list={['flex flex-wrap items-center gap-3', className]}
+>
+  {links.map((link) => (
+    <Button
+      href={link.href}
+      variant="secondary"
+      icon={link.icon}
+      iconSource={link.source}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {t(locale, link.key)}
+      <Icon name="ExternalLink" class="text-[0.85em]" />
+      <span class="sr-only">{t(locale, 'link.opensInNewTab')}</span>
+    </Button>
+  ))}
+
+  <span class="inline-flex items-center gap-1">
+    <a
+      hidden
+      data-email-link
+      data-email={encoded}
+      href="#"
+      class="font-mono text-base text-accent underline decoration-1 underline-offset-4 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:decoration-2"
+    >
+      {t(locale, 'contact.email')}
+    </a>
+    <Button
+      hidden
+      data-copy-email
+      variant="ghost"
+      size="sm"
+      aria-label={t(locale, 'contact.copyEmail')}
+    >
+      <Icon name="Copy" class="text-[1.25em]" />
+      <Icon name="Check" class="hidden text-[1.25em]" />
+    </Button>
+    <span
+      role="status"
+      aria-live="polite"
+      data-copy-status
+      data-message={t(locale, 'contact.emailCopied')}
+      class="sr-only"
+    ></span>
+    <noscript>
+      <span class="font-mono text-base">
+        {t(locale, 'contact.emailNoscript')}
+      </span>
+    </noscript>
+  </span>
+</div>
+
+<script>
+  import { decodeEmail } from '../lib/email';
+
+  const RESET_MS = 2000;
+
+  function selectText(node: HTMLElement) {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>('[data-contact-links]')
+    .forEach((group) => {
+      const link = group.querySelector<HTMLAnchorElement>('[data-email-link]');
+      const copy = group.querySelector<HTMLButtonElement>('[data-copy-email]');
+      const status = group.querySelector<HTMLElement>('[data-copy-status]');
+      if (!link || !copy || !status) return;
+
+      const address = decodeEmail(link.dataset.email ?? '');
+      link.href = `mailto:${address}`;
+      link.textContent = address;
+      link.hidden = false;
+      copy.hidden = false;
+
+      const [copyIcon, checkIcon] = copy.querySelectorAll<SVGElement>('svg');
+      let timer: number | undefined;
+
+      copy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(address);
+        } catch {
+          // Clipboard API unavailable or denied: select the address instead.
+          selectText(link);
+          return;
+        }
+        status.textContent = status.dataset.message ?? '';
+        copyIcon?.classList.add('hidden');
+        checkIcon?.classList.remove('hidden');
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          status.textContent = '';
+          copyIcon?.classList.remove('hidden');
+          checkIcon?.classList.add('hidden');
+        }, RESET_MS);
+      });
+    });
+</script>

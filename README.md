@@ -35,6 +35,14 @@ On every pull request and on merge to `main`:
 
 Content lives in versioned content files in this repository. (Details to be completed by the content tickets.)
 
+### Profile (name, photo, headline, About)
+
+`src/content/profile/` holds `meta.yaml` (name, photo, GitHub, LinkedIn and email), `photo.jpg`, and `en.md` / `es.md` (frontmatter `headline` and `photoAlt`; the body is the About text). Edit these files; both languages are required.
+
+### Adding a CV
+
+Put the PDF in `public/cv/` named `cv-en.pdf` and/or `cv-es.pdf`. The "Download CV" button then appears automatically on `/en/` and/or `/es/`, one language at a time. With no file for a language, no button is shown. Do not commit a placeholder PDF.
+
 ### Adding Media to a Project
 
 A Project can have optional `media` in its `meta.yaml`, plus a `mediaAlt` (1 to 160 characters) in **both** `en.md` and `es.md`. Without `media`, the Project keeps its generated cover.

@@ -54,7 +54,9 @@ for (const locale of ['en', 'es'] as const) {
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
       await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
       await expect(page.getByRole('main')).toContainText(
-        locale === 'en' ? 'Portfolio coming soon.' : 'Portfolio próximamente.',
+        locale === 'en'
+          ? 'Software engineering student'
+          : 'Estudiante de Ingeniería',
       );
     });
 

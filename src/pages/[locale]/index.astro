@@ -1,33 +1,34 @@
 ---
+import About from '../../components/About.astro';
 import ExperienceEducation from '../../components/ExperienceEducation.astro';
 import FeaturedProjects from '../../components/FeaturedProjects.astro';
+import Hero from '../../components/Hero.astro';
 import Events from '../../components/Events.astro';
 import MoreProjects from '../../components/MoreProjects.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
 import { locales, t, type Locale } from '../../i18n';
+import { getProfile } from '../../lib/profile';
 
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
 
 const locale = Astro.params.locale as Locale;
-const name = 'Alfonso Ramos Rojas';
+const profile = await getProfile(locale);
 ---
 
 <LocaleLayout
   locale={locale}
-  title={name}
+  title={profile.name}
   description={t(locale, 'meta.description')}
 >
   <header class="flex justify-end p-4">
     <LanguageSwitch locale={locale} />
   </header>
   <main>
-    <div class="flex flex-col items-center justify-center gap-2 pt-24">
-      <h1 class="text-4xl font-bold">{name}</h1>
-      <p class="text-text-muted">{t(locale, 'home.comingSoon')}</p>
-    </div>
+    <Hero locale={locale} profile={profile} />
+    <About locale={locale} html={profile.aboutHtml} />
     <ExperienceEducation locale={locale} />
     <FeaturedProjects locale={locale} />
     <MoreProjects locale={locale} />

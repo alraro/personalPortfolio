@@ -1,0 +1,65 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  photo: ImageMetadata;
+  alt: string;
+  /** Above the fold: load eagerly with high priority. */
+  priority?: boolean;
+  class?: string;
+}
+
+const { photo, alt, priority = false, class: className } = Astro.props;
+---
+
+{/* Duotone from tokens: the greyscale photo is multiplied over the highlight
+    colour, then lifted to the shadow colour with a `lighten` layer. Both
+    colours change with the theme (see --color-photo-* in tokens.css). */}
+<div
+  data-profile-photo
+  class:list={[
+    'profile-photo relative isolate aspect-square overflow-hidden rounded-lg outline-1 outline-offset-4 outline-border',
+    className,
+  ]}
+>
+  <Picture
+    src={photo}
+    alt={alt}
+    formats={['avif', 'webp']}
+    widths={[288, 460]}
+    sizes="(min-width: 1024px) 18rem, 14rem"
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    class="size-full object-cover"
+  />
+</div>
+
+<style>
+  .profile-photo {
+    background-color: var(--color-photo-highlight);
+  }
+  .profile-photo :global(img) {
+    filter: var(--photo-filter);
+    mix-blend-mode: multiply;
+  }
+  .profile-photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-color: var(--color-photo-shadow);
+    mix-blend-mode: lighten;
+    pointer-events: none;
+  }
+  .profile-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+    mix-blend-mode: overlay;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+</style>

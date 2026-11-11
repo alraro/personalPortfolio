@@ -2,11 +2,13 @@
 // One wrapper for the two allowed icon sources:
 //  - Lucide (general icons): name is the PascalCase Lucide name, e.g. "Sun".
 //  - Simple Icons (brands): name is the Simple Icons key without "si", e.g. "Github".
+//  - Custom (brands neither library ships): name is a key of src/lib/custom-icons.ts.
 import { icons as lucideIcons } from 'lucide';
 import * as simpleIcons from 'simple-icons';
+import { customIcons } from '../lib/custom-icons';
 
 interface Props {
-  source?: 'lucide' | 'simple';
+  source?: 'lucide' | 'simple' | 'custom';
   name: string;
   /** Accessible name. Without it the icon is decorative (aria-hidden). */
   label?: string;
@@ -26,12 +28,14 @@ const brand =
       ]
     : undefined;
 
-if (!lucideNode && !brand) {
+const customPath = source === 'custom' ? customIcons[name] : undefined;
+
+if (!lucideNode && !brand && !customPath) {
   throw new Error(`Unknown ${source} icon "${name}"`);
 }
 ---
 
-{brand ? (
+{brand || customPath ? (
   <svg
     viewBox="0 0 24 24"
     fill="currentColor"
@@ -41,7 +45,10 @@ if (!lucideNode && !brand) {
     aria-hidden={label ? undefined : 'true'}
     focusable="false"
   >
-    <path d={brand.path} />
+    <path
+      d={brand ? brand.path : customPath}
+      fill-rule={brand ? undefined : 'evenodd'}
+    />
   </svg>
 ) : (
   <svg

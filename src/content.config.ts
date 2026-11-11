@@ -73,6 +73,36 @@ const projectText = defineCollection({
   }),
 });
 
+/** `src/content/profile/meta.yaml`: the Owner's data shared by both languages. */
+const profileMeta = defineCollection({
+  loader: glob({
+    base: './src/content/profile',
+    pattern: 'meta.yaml',
+    generateId,
+  }),
+  schema: ({ image }) =>
+    z.strictObject({
+      name: z.string().min(1),
+      photo: image(),
+      github: z.url(),
+      linkedin: z.url(),
+      email: z.email(),
+    }),
+});
+
+/** `src/content/profile/{en,es}.md`: headline, photo alt text and About body. */
+const profileText = defineCollection({
+  loader: glob({
+    base: './src/content/profile',
+    pattern: '{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    headline: z.string().min(1).max(120),
+    photoAlt: z.string().min(1).max(120),
+  }),
+});
+
 const yearMonth = z
   .string()
   .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM');
@@ -169,6 +199,8 @@ export const collections = {
   eventText,
   projectMeta,
   projectText,
+  profileMeta,
+  profileText,
   experienceMeta,
   experienceText,
   educationMeta,

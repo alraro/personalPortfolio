@@ -15,7 +15,9 @@ import {
   getExperience,
   getFeaturedProjects,
 } from '../../lib/catalogue';
+import { getImage } from 'astro:assets';
 import { buildNavItems } from '../../lib/nav';
+import { buildPersonJsonLd } from '../../lib/seo';
 import { getProfile } from '../../lib/profile';
 
 export function getStaticPaths() {
@@ -38,12 +40,18 @@ const navItems = buildNavItems({
   events: events.length > 0,
   contact: true,
 });
+const photo = await getImage({ src: profile.photo, width: 460, format: 'jpg' });
+const jsonLd = buildPersonJsonLd({
+  headline: profile.headline,
+  image: new URL(photo.src, Astro.site).href,
+});
 ---
 
 <LocaleLayout
   locale={locale}
-  title={profile.name}
+  title={t(locale, 'meta.title.home')}
   description={t(locale, 'meta.description')}
+  jsonLd={jsonLd}
 >
   <Nav locale={locale} name={profile.name} items={navItems} />
   <main id="main" tabindex="-1" class="focus:outline-none">

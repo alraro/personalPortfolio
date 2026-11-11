@@ -1,0 +1,54 @@
+---
+// Cloudflare Pages serves this file with HTTP 404 for unknown paths. The
+// locale is unknown here, so the page speaks both languages.
+import Button from '../components/Button.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import LocaleLayout from '../layouts/LocaleLayout.astro';
+import { t } from '../i18n';
+import { getProfile } from '../lib/profile';
+
+const { name } = await getProfile('en');
+const blocks = [
+  { locale: 'en', href: '/en/' },
+  { locale: 'es', href: '/es/' },
+] as const;
+---
+
+<LocaleLayout
+  locale="en"
+  title={`${t('en', 'notFound.title')} / ${t('es', 'notFound.title')}`}
+  description={t('en', 'notFound.text')}
+  noindex
+  alternates={false}
+>
+  <header class="border-b border-border bg-surface">
+    <div class="mx-auto flex h-20 w-full max-w-6xl items-center gap-4 px-4">
+      <a
+        href="/en/"
+        class="mr-auto rounded-sm font-display text-xl font-semibold tracking-(--tracking-display) text-text"
+      >
+        {name}
+      </a>
+      <ThemeToggle locale="en" />
+    </div>
+  </header>
+  <main id="main" tabindex="-1" class="focus:outline-none">
+    <div class="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 md:grid-cols-2">
+      {blocks.map(({ locale, href }) => {
+        const Heading = locale === 'en' ? 'h1' : 'h2';
+        return (
+          <section lang={locale === 'es' ? 'es' : undefined} class="space-y-4">
+            <p class="font-mono text-sm text-accent">404</p>
+            <Heading class="font-display text-4xl leading-(--leading-display) font-semibold tracking-(--tracking-display) text-text">
+              {t(locale, 'notFound.title')}
+            </Heading>
+            <p class="text-lg text-text-muted">{t(locale, 'notFound.text')}</p>
+            <Button href={href} hreflang={locale}>
+              {t(locale, 'notFound.cta')}
+            </Button>
+          </section>
+        );
+      })}
+    </div>
+  </main>
+</LocaleLayout>

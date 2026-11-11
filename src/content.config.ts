@@ -57,4 +57,74 @@ const projectText = defineCollection({
   }),
 });
 
-export const collections = { projectMeta, projectText };
+const yearMonth = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM');
+const httpsUrl = z
+  .url()
+  .refine((url) => url.startsWith('https://'), 'must be an https:// URL');
+
+// Experience and Education: `src/content/<kind>/<slug>/{meta.yaml,en.md,es.md}`.
+// Cross-field rules (end >= start) are checked by the catalogue core, which
+// reports every problem at once.
+const experienceMeta = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    organization: z.string().min(1).max(80),
+    organizationUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const experienceText = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    role: z.string().min(1).max(80),
+    organization: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
+  }),
+});
+const educationMeta = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    institution: z.string().min(1).max(80),
+    institutionUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const educationText = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    programme: z.string().min(1).max(100),
+    institution: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
+  }),
+});
+
+export const collections = {
+  projectMeta,
+  projectText,
+  experienceMeta,
+  experienceText,
+  educationMeta,
+  educationText,
+};

@@ -14,7 +14,22 @@ import {
   type ProjectText,
 } from './core';
 
+export type {
+  EducationItem,
+  ExperienceItem,
+  TimelineItemData,
+} from './timeline';
 export type { Project, ProjectLink, GeneratedCover } from './core';
+import {
+  buildEducationList,
+  buildExperienceList,
+  type EducationItem,
+  type EducationMeta,
+  type EducationText,
+  type ExperienceItem,
+  type ExperienceMeta,
+  type ExperienceText,
+} from './timeline';
 
 async function loadProjectLists(locale: Locale) {
   const [metaEntries, textEntries] = await Promise.all([
@@ -40,4 +55,53 @@ export async function getFeaturedProjects(locale: Locale): Promise<Project[]> {
 /** Non-featured Projects for `locale`, sorted by `order`. Throws ContentError. */
 export async function getMoreProjects(locale: Locale): Promise<Project[]> {
   return (await loadProjectLists(locale)).more;
+}
+
+function splitId(id: string): [string, string] {
+  const [slug, rest] = id.split('/') as [string, string];
+  return [slug, rest];
+}
+
+/** Experience for `locale`: current first, then by end and start descending. */
+export async function getExperience(locale: Locale): Promise<ExperienceItem[]> {
+  const [metaEntries, textEntries] = await Promise.all([
+    getCollection('experienceMeta'),
+    getCollection('experienceText'),
+  ]);
+  const metas: ExperienceMeta[] = metaEntries.map((entry) => ({
+    ...entry.data,
+    slug: splitId(entry.id)[0],
+  }));
+  const texts: ExperienceText[] = textEntries.map((entry) => {
+    const [slug, entryLocale] = splitId(entry.id);
+    return {
+      ...entry.data,
+      slug,
+      locale: entryLocale as Locale,
+      body: entry.body ?? '',
+    };
+  });
+  return buildExperienceList({ metas, texts, locale });
+}
+
+/** Education for `locale`, sorted like Experience. Throws ContentError. */
+export async function getEducation(locale: Locale): Promise<EducationItem[]> {
+  const [metaEntries, textEntries] = await Promise.all([
+    getCollection('educationMeta'),
+    getCollection('educationText'),
+  ]);
+  const metas: EducationMeta[] = metaEntries.map((entry) => ({
+    ...entry.data,
+    slug: splitId(entry.id)[0],
+  }));
+  const texts: EducationText[] = textEntries.map((entry) => {
+    const [slug, entryLocale] = splitId(entry.id);
+    return {
+      ...entry.data,
+      slug,
+      locale: entryLocale as Locale,
+      body: entry.body ?? '',
+    };
+  });
+  return buildEducationList({ metas, texts, locale });
 }

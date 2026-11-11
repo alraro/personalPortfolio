@@ -13,6 +13,13 @@ export const en = {
   'linkType.paper': 'Paper',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Projects',
+  'experience.heading': 'Experience & Education',
+  'experience.experience': 'Experience',
+  'experience.education': 'Education',
+  'timeline.present': 'Present',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Current entry, closed entry, entry without URL and entry without description.',
   'ds.title': 'Design system',
   'ds.intro':
     'This page documents the design tokens and base components used across the portfolio. It is for the Owner and contributors, not for Visitors.',
@@ -88,6 +95,13 @@ export const es: Dictionary = {
   'linkType.paper': 'Artículo',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Proyectos',
+  'experience.heading': 'Experiencia y formación',
+  'experience.experience': 'Experiencia',
+  'experience.education': 'Formación',
+  'timeline.present': 'actualidad',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Entrada actual, entrada cerrada, entrada sin URL y entrada sin descripción.',
   'ds.title': 'Sistema de diseño',
   'ds.intro':
     'Esta página documenta los tokens de diseño y los componentes base del portfolio. Es para el Owner y colaboradores, no para los Visitors.',

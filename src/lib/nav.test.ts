@@ -41,6 +41,25 @@ describe('buildNavItems', () => {
     ]);
   });
 
+  it('shows Projects when only More projects exist, linking to it', () => {
+    const items = buildNavItems({ about: true, moreProjects: true });
+    expect(items).toEqual([
+      { id: 'about', labelKey: 'nav.about' },
+      { id: 'more-projects', labelKey: 'nav.projects' },
+    ]);
+  });
+
+  it('links Projects to Featured when both exist', () => {
+    const items = buildNavItems({ projects: true, moreProjects: true });
+    expect(items).toEqual([{ id: 'projects', labelKey: 'nav.projects' }]);
+  });
+
+  it('hides Projects when neither exists', () => {
+    expect(buildNavItems({ about: true, moreProjects: false })).toEqual([
+      { id: 'about', labelKey: 'nav.about' },
+    ]);
+  });
+
   it('treats a missing key as an absent section', () => {
     expect(buildNavItems({ contact: true }).map((item) => item.id)).toEqual([
       'contact',

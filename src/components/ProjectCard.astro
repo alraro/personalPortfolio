@@ -1,9 +1,9 @@
 ---
 import type { Project } from '../lib/catalogue/core';
 import { t, type Locale } from '../i18n';
-import GeneratedCover from './GeneratedCover.astro';
 import Icon from './Icon.astro';
 import Link from './Link.astro';
+import ProjectMedia from './ProjectMedia.astro';
 import Tag from './Tag.astro';
 
 interface Props {
@@ -40,6 +40,7 @@ const linkName = (type: string) =>
     links sit above it (z-10), so there are no nested anchors. */}
 <article
   id={`project-${project.slug}`}
+  data-project-card
   data-variant={variant}
   data-side={side}
   class:list={[
@@ -48,10 +49,7 @@ const linkName = (type: string) =>
   ]}
 >
   <div class:list={['min-w-0', side === 'media-right' && 'md:order-2']}>
-    <GeneratedCover
-      title={project.cover.title}
-      tagline={project.cover.tagline}
-    />
+    <ProjectMedia media={project.media} />
   </div>
   <div class="flex min-w-0 flex-col gap-4">
     <div class="flex flex-col gap-2">

@@ -23,25 +23,39 @@ const projectMeta = defineCollection({
     pattern: '*/meta.yaml',
     generateId,
   }),
-  schema: z.strictObject({
-    order: z.number().int().min(1),
-    featured: z.boolean(),
-    tags: z.array(z.string().min(1).max(24)).min(1).max(6),
-    links: z
-      .strictObject({
-        primary: link,
-        secondary: z.array(link).max(3).optional(),
-      })
-      .superRefine((links, ctx) => {
-        if (links.secondary?.some((l) => l.url === links.primary.url)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'secondary links must not repeat the primary URL',
-            path: ['secondary'],
-          });
-        }
-      }),
-  }),
+  schema: ({ image }) =>
+    z.strictObject({
+      order: z.number().int().min(1),
+      featured: z.boolean(),
+      tags: z.array(z.string().min(1).max(24)).min(1).max(6),
+      links: z
+        .strictObject({
+          primary: link,
+          secondary: z.array(link).max(3).optional(),
+        })
+        .superRefine((links, ctx) => {
+          if (links.secondary?.some((l) => l.url === links.primary.url)) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'secondary links must not repeat the primary URL',
+              path: ['secondary'],
+            });
+          }
+        }),
+      // Image files live inside the Project folder (relative paths); video
+      // files live under public/media/projects/<slug>/ (checked by the core).
+      media: z
+        .discriminatedUnion('kind', [
+          z.strictObject({ kind: z.literal('image'), src: image() }),
+          z.strictObject({
+            kind: z.literal('video'),
+            mp4: z.string(),
+            webm: z.string().optional(),
+            poster: image(),
+          }),
+        ])
+        .optional(),
+    }),
 });
 
 /** `src/content/projects/<slug>/{en,es}.md`: localized fields + long description. */
@@ -54,6 +68,7 @@ const projectText = defineCollection({
   schema: z.strictObject({
     title: z.string().min(1).max(60),
     subtitle: z.string().min(1).max(120),
+    mediaAlt: z.string().min(1).max(160).optional(),
   }),
 });
 

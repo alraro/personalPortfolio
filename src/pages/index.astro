@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { t } from '../i18n';
 ---
 
 <!doctype html>
@@ -8,9 +9,39 @@ import '../styles/global.css';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Alfonso Ramos Rojas</title>
+    <meta name="robots" content="noindex" />
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/en/" />
+    </noscript>
   </head>
-  <body class="flex min-h-screen flex-col items-center justify-center gap-2 bg-neutral-950 text-neutral-100">
-    <h1 class="text-4xl font-bold">Alfonso Ramos Rojas</h1>
-    <p class="text-neutral-400">Portfolio coming soon.</p>
+  <body class="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-100">
+    <main>
+      <ul class="flex gap-4">
+        <li>
+          <a href="/en/" hreflang="en" lang="en" class="underline">
+            {t('en', 'language.en.name')}
+          </a>
+        </li>
+        <li>
+          <a href="/es/" hreflang="es" lang="es" class="underline">
+            {t('es', 'language.es.name')}
+          </a>
+        </li>
+      </ul>
+    </main>
+    <script>
+      import { decideLocale, LANG_STORAGE_KEY } from '../i18n/locale';
+
+      let stored: string | null = null;
+      try {
+        stored = localStorage.getItem(LANG_STORAGE_KEY);
+      } catch {
+        // Storage may be unavailable.
+      }
+      const languages = navigator.languages?.length
+        ? navigator.languages
+        : [navigator.language];
+      location.replace(`/${decideLocale(stored, languages)}/`);
+    </script>
   </body>
 </html>

@@ -7,6 +7,15 @@ export default defineConfig({
   site: 'https://alfonsoramos.dev',
   output: 'static',
   integrations: [react()],
+  i18n: {
+    locales: ['en', 'es'],
+    defaultLocale: 'en',
+    routing: {
+      prefixDefaultLocale: true,
+      // The root page `/` detects the language in the browser instead.
+      redirectToDefaultLocale: false,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

@@ -29,21 +29,34 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
-      - name: Get Playwright version
-        id: playwright-version
-        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
+      - uses: actions/upload-artifact@v4
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-      - name: Install Chromium with system dependencies
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Install system dependencies only
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
+
+  e2e:
+    name: Browser tests
+    needs: ci
+    runs-on: ubuntu-latest
+    # Official Playwright image: Chromium and its system deps are preinstalled,
+    # so CI does not depend on the Ubuntu apt mirrors. Keep the tag in sync with
+    # @playwright/test in package.json (Renovate groups both updates).
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - run: pnpm test:e2e
       - name: Upload Playwright report
         if: failure()
@@ -54,12 +67,6 @@ jobs:
             playwright-report
             test-results
           if-no-files-found: ignore
-          retention-days: 7
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          if-no-files-found: error
           retention-days: 7
 
   lighthouse:
@@ -113,7 +120,7 @@ jobs:
 
   deploy:
     name: Deploy to Cloudflare Pages
-    needs: [ci, lighthouse, links]
+    needs: [ci, e2e, lighthouse, links]
     runs-on: ubuntu-latest
     # Fork PRs get no secrets; skip them.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository

@@ -1,0 +1,12 @@
+# TODO(owner): draft copy derived from the public repository README and code, review before publishing.
+order: 4
+featured: true
+tags:
+  - C
+  - '42'
+  - Unix
+  - Shell
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/42-Minishell

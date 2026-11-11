@@ -25,7 +25,7 @@ const items = locales.map((target) => ({
           lang={item.target}
           aria-current={item.current ? 'true' : undefined}
           data-lang-choice={item.target}
-          class="rounded px-1 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 aria-[current=true]:font-bold"
+          class="rounded-sm px-1 font-mono text-sm text-text-muted underline-offset-4 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-text hover:underline aria-[current=true]:font-semibold aria-[current=true]:text-accent"
         >
           <span aria-hidden="true">{item.short}</span>
           <span class="sr-only">{item.name}</span>

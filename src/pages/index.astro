@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import ThemeHead from '../components/ThemeHead.astro';
 import { t } from '../i18n';
 ---
 
@@ -8,13 +9,14 @@ import { t } from '../i18n';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ThemeHead />
     <title>Alfonso Ramos Rojas</title>
     <meta name="robots" content="noindex" />
     <noscript>
       <meta http-equiv="refresh" content="0; url=/en/" />
     </noscript>
   </head>
-  <body class="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-100">
+  <body class="flex min-h-screen items-center justify-center">
     <main>
       <ul class="flex gap-4">
         <li>

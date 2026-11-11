@@ -13,6 +13,13 @@ export const en = {
   'linkType.paper': 'Paper',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Projects',
+  'experience.heading': 'Experience & Education',
+  'experience.experience': 'Experience',
+  'experience.education': 'Education',
+  'timeline.present': 'Present',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Current entry, closed entry, entry without URL and entry without description.',
   'moreProjects.heading': 'More projects',
   'ds.title': 'Design system',
   'ds.intro':
@@ -93,6 +100,13 @@ export const es: Dictionary = {
   'linkType.paper': 'Artículo',
   'project.linkName': '{type}: {title}',
   'projects.heading': 'Proyectos',
+  'experience.heading': 'Experiencia y formación',
+  'experience.experience': 'Experiencia',
+  'experience.education': 'Formación',
+  'timeline.present': 'actualidad',
+  'ds.timelineItem': 'TimelineItem',
+  'ds.timelineItemNote':
+    'Entrada actual, entrada cerrada, entrada sin URL y entrada sin descripción.',
   'moreProjects.heading': 'Más proyectos',
   'ds.title': 'Sistema de diseño',
   'ds.intro':

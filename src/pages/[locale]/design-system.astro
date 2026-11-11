@@ -8,6 +8,8 @@ import Icon from '../../components/Icon.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import Link from '../../components/Link.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
+import TimelineItem from '../../components/TimelineItem.astro';
+import type { TimelineItemData } from '../../lib/catalogue/timeline';
 import Tag from '../../components/Tag.astro';
 import ThemeToggle from '../../components/ThemeToggle.astro';
 import LocaleLayout from '../../layouts/LocaleLayout.astro';
@@ -102,6 +104,26 @@ const demoRight = sampleProject('ds-right', 'Sample Project');
 const demoLeft = sampleProject('ds-left', 'Another Project');
 const spineA = sampleProject('ds-spine-a', 'Spine one');
 const spineB = sampleProject('ds-spine-b', 'Spine two');
+
+const sampleTimeline: TimelineItemData[] = [
+  {
+    slug: 'ds-current',
+    title: t(locale, 'ds.sample'),
+    organization: 'Example Org',
+    organizationUrl: 'https://example.com/',
+    location: 'Málaga',
+    dateRange: `Sep 2022 – ${t(locale, 'timeline.present')}`,
+    descriptionHtml: `<p>${t(locale, 'ds.sample')}.</p>`,
+  },
+  {
+    slug: 'ds-closed',
+    title: t(locale, 'ds.sample'),
+    organization: 'Example Org',
+    location: 'Málaga',
+    dateRange: 'Sep 2019 – Jun 2022',
+    descriptionHtml: '',
+  },
+];
 
 const compactCover = sampleProject('ds-compact-cover', 'Compact cover');
 const compactGrid = [
@@ -477,6 +499,20 @@ const card = 'rounded-lg border border-border bg-surface p-5';
             <ProjectCard project={spineB} locale={locale} side="media-left" />
           </li>
         </ProjectSpine>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-3']}>
+        <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.timelineItem')}
+        </h3>
+        <p class="text-sm text-text-muted">
+          {t(locale, 'ds.timelineItemNote')}
+        </p>
+        <ol aria-label={t(locale, 'ds.timelineItem')}>
+          {sampleTimeline.map((item) => (
+            <TimelineItem item={item} locale={locale} />
+          ))}
+        </ol>
       </div>
 
       <div class:list={[card, 'flex flex-col gap-3']}>

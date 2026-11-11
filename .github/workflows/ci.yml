@@ -115,7 +115,15 @@ jobs:
           restore-keys: lychee-
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --config lychee.toml --root-dir "${{ github.workspace }}/dist" './dist/**/*.html'
+          # Own-site absolute URLs (canonical, hreflang) are checked against this
+          # build, not production: a PR's new pages are not deployed yet.
+          # The weekly workflow checks production itself.
+          args: >-
+            --config lychee.toml
+            --root-dir "${{ github.workspace }}/dist"
+            --remap '^https://alfonsoramos\.dev/(.*)$ file://${{ github.workspace }}/dist/$1'
+            --index-files index.html
+            './dist/**/*.html'
           fail: true
 
   deploy:

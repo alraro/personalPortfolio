@@ -2,7 +2,15 @@ import type { Locale } from './locale';
 
 export const en = {
   'home.comingSoon': 'Portfolio coming soon.',
-  'meta.description': 'Portfolio of Alfonso Ramos Rojas.',
+  'meta.description':
+    'Software engineering student at the University of Málaga, research assistant at Mobilenet and student at 42 Málaga. Projects in systems, DevOps and more.',
+  'meta.title.home': 'Alfonso Ramos Rojas — Software Engineering Student',
+  'meta.title.designSystem': 'Design system — Alfonso Ramos Rojas',
+  'meta.ogAlt':
+    'Alfonso Ramos Rojas, software engineering student. alfonsoramos.dev',
+  'notFound.title': 'Page not found',
+  'notFound.text': 'This page does not exist or has moved.',
+  'notFound.cta': 'Go to the English home',
   'language.switchLabel': 'Language',
   'theme.switchToLight': 'Switch to light theme',
   'theme.switchToDark': 'Switch to dark theme',
@@ -140,7 +148,16 @@ export type Dictionary = Record<DictionaryKey, string>;
 // Typed against the keys of `en`: a missing or extra key fails `pnpm build`.
 export const es: Dictionary = {
   'home.comingSoon': 'Portfolio próximamente.',
-  'meta.description': 'Portfolio de Alfonso Ramos Rojas.',
+  'meta.description':
+    'Estudiante de Ingeniería del Software en la Universidad de Málaga, investigador en Mobilenet y alumno de 42 Málaga. Proyectos de sistemas, DevOps y más.',
+  'meta.title.home':
+    'Alfonso Ramos Rojas — Estudiante de Ingeniería del Software',
+  'meta.title.designSystem': 'Sistema de diseño — Alfonso Ramos Rojas',
+  'meta.ogAlt':
+    'Alfonso Ramos Rojas, estudiante de Ingeniería del Software. alfonsoramos.dev',
+  'notFound.title': 'Página no encontrada',
+  'notFound.text': 'Esta página no existe o se ha movido.',
+  'notFound.cta': 'Ir a la página en español',
   'language.en.name': 'English',
   'language.es.name': 'Español',
   'language.en.short': 'EN',

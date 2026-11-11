@@ -13,8 +13,11 @@ permissions:
   contents: read
 
 jobs:
-  ci:
-    name: Lint, typecheck, build
+  # Static checks and the build run in parallel; every job that needs the
+  # built site depends on `build` only, so Lighthouse, browser tests and links
+  # start as soon as dist exists.
+  checks:
+    name: Format, lint, unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,9 +29,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
       - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm build
       - run: pnpm test
+
+  build:
+    # `pnpm build` runs `astro check` (typecheck) before `astro build`.
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -38,7 +53,7 @@ jobs:
 
   e2e:
     name: Browser tests
-    needs: ci
+    needs: build
     runs-on: ubuntu-latest
     # Official Playwright image: Chromium and its system deps are preinstalled,
     # so CI does not depend on the Ubuntu apt mirrors. Keep the tag in sync with
@@ -70,9 +85,14 @@ jobs:
           retention-days: 7
 
   lighthouse:
-    name: Lighthouse
-    needs: ci
+    name: Lighthouse (${{ matrix.preset }})
+    needs: build
     runs-on: ubuntu-latest
+    strategy:
+      # Mobile and desktop are independent: run both and report both.
+      fail-fast: false
+      matrix:
+        preset: [mobile, desktop]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -85,22 +105,21 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: Lighthouse (mobile)
-        run: AUDIT_PRESET=mobile pnpm exec lhci autorun
-      - name: Lighthouse (desktop)
-        if: ${{ !cancelled() }}
-        run: AUDIT_PRESET=desktop pnpm exec lhci autorun
+      - name: Lighthouse
+        run: pnpm exec lhci autorun
+        env:
+          AUDIT_PRESET: ${{ matrix.preset }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: lighthouse-reports
+          name: lighthouse-reports-${{ matrix.preset }}
           path: lhci-reports
           if-no-files-found: warn
           retention-days: 14
 
   links:
     name: Links
-    needs: ci
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +147,7 @@ jobs:
 
   deploy:
     name: Deploy to Cloudflare Pages
-    needs: [ci, e2e, lighthouse, links]
+    needs: [checks, build, e2e, lighthouse, links]
     runs-on: ubuntu-latest
     # Fork PRs get no secrets; skip them.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository

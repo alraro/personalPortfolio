@@ -63,6 +63,10 @@ Scripts:
 
 Pull requests are squash-merged only, so the PR title becomes the commit message. The title must follow [Conventional Commits](https://www.conventionalcommits.org/) with one of these types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. A CI check enforces this.
 
+## Privacy
+
+This site uses [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) to count Visitors. It is cookie-free, collects no personal data and does no cross-site tracking, so no cookie banner is needed. No other analytics or tracking code is included.
+
 ## Licence
 
 The source code is released under the [MIT licence](LICENSE).

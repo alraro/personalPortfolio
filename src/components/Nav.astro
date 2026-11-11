@@ -1,0 +1,203 @@
+---
+import { t, type Locale } from '../i18n';
+import { initials, type NavItem } from '../lib/nav';
+import Icon from './Icon.astro';
+import LanguageSwitch from './LanguageSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  /** The Owner's name, shown in the display font (initials below 400 px). */
+  name: string;
+  /** Only the sections the page renders (see `buildNavItems`). */
+  items: NavItem[];
+  /** Stick to the top of the page. The design-system demos turn this off. */
+  sticky?: boolean;
+  /** Design-system demo: use the mobile layout at any width. */
+  forceMobile?: boolean;
+  /** Prefix for ids, so the design-system page can show several navs. */
+  idPrefix?: string;
+}
+
+const {
+  locale,
+  name,
+  items,
+  sticky = true,
+  forceMobile = false,
+  idPrefix = 'nav',
+} = Astro.props;
+const panelId = `${idPrefix}-menu`;
+
+// Class names are written out in full so Tailwind can see them.
+const desktopNav = forceMobile ? 'hidden' : 'hidden md:block';
+const mobileNav = forceMobile ? '' : 'md:hidden';
+const link =
+  'relative rounded-sm py-1 font-mono text-sm text-text-muted underline decoration-transparent decoration-2 underline-offset-8 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-text aria-[current=location]:text-text aria-[current=location]:decoration-accent';
+---
+
+<header
+  data-nav
+  class:list={[
+    'z-40 w-full border-b border-border bg-surface/90 backdrop-blur',
+    sticky && !forceMobile ? 'sticky top-0' : 'relative',
+  ]}
+>
+  <div class="mx-auto flex h-20 w-full max-w-6xl items-center gap-4 px-4">
+    <a
+      href={`/${locale}/`}
+      class="mr-auto rounded-sm font-display text-xl font-semibold tracking-(--tracking-display) text-text"
+    >
+      <span aria-hidden="true" class="min-[400px]:hidden">
+        {initials(name)}
+      </span>
+      <span aria-hidden="true" class="hidden min-[400px]:inline">
+        {name}
+      </span>
+      <span class="sr-only">{t(locale, 'nav.home')}</span>
+    </a>
+
+    <nav aria-label={t(locale, 'nav.main')} class={desktopNav}>
+      <ul class="flex items-center gap-6">
+        {items.map((item) => (
+          <li>
+            <a href={`#${item.id}`} data-nav-link={item.id} class={link}>
+              {t(locale, item.labelKey)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <LanguageSwitch locale={locale} />
+    <ThemeToggle locale={locale} />
+
+    <nav aria-label={t(locale, 'nav.main')} class={mobileNav}>
+      <button
+        type="button"
+        data-nav-button
+        aria-expanded="false"
+        aria-controls={panelId}
+        class="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-surface px-3 font-mono text-sm text-text transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:border-accent hover:text-accent"
+      >
+        <Icon name="Menu" class="text-lg" />
+        <Icon name="X" class="hidden text-lg" />
+        {t(locale, 'nav.menu')}
+      </button>
+      <ul
+        id={panelId}
+        data-nav-panel
+        hidden
+        class="absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-surface px-4 py-3 shadow-md"
+      >
+        {items.map((item) => (
+          <li>
+            <a
+              href={`#${item.id}`}
+              data-nav-link={item.id}
+              class:list={[link, 'block py-2 text-base']}
+            >
+              {t(locale, item.labelKey)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-nav]').forEach((nav) => {
+    const button = nav.querySelector<HTMLButtonElement>('[data-nav-button]');
+    const panel = nav.querySelector<HTMLElement>('[data-nav-panel]');
+    if (!button || !panel) return;
+    const [iconOpen, iconClose] = button.querySelectorAll('svg');
+
+    // Disclosure pattern: the button toggles the panel; no focus trap.
+    function setOpen(open: boolean) {
+      button!.setAttribute('aria-expanded', String(open));
+      panel!.hidden = !open;
+      iconOpen?.classList.toggle('hidden', open);
+      iconClose?.classList.toggle('hidden', !open);
+    }
+
+    button.addEventListener('click', () =>
+      setOpen(button.getAttribute('aria-expanded') !== 'true'),
+    );
+    panel.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Escape' &&
+        button.getAttribute('aria-expanded') === 'true'
+      ) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!nav.contains(event.target as Node)) setOpen(false);
+    });
+  });
+
+  // Current section: mark the link whose section is in the reading band.
+  const firstNav = document.querySelector<HTMLElement>('[data-nav]');
+  if (firstNav) {
+    const ids = [
+      ...new Set(
+        [...firstNav.querySelectorAll<HTMLElement>('[data-nav-link]')].map(
+          (link) => link.dataset.navLink!,
+        ),
+      ),
+    ];
+    const visible = new Set<string>();
+
+    const mark = (current: string | undefined) =>
+      document
+        .querySelectorAll<HTMLElement>('[data-nav-link]')
+        .forEach((link) => {
+          if (link.dataset.navLink === current) {
+            link.setAttribute('aria-current', 'location');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+
+    const targets = ids.flatMap((id) => {
+      const el = document.getElementById(id);
+      // Headings sit inside their section; observe the section itself.
+      return el ? [{ id, el: el.closest('section') ?? el }] : [];
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = targets.find((target) => target.el === entry.target)?.id;
+          if (!id) continue;
+          if (entry.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+        const current = [...ids].reverse().find((id) => visible.has(id));
+        if (current) mark(current);
+        else if (window.scrollY < 200) mark(undefined);
+      },
+      { rootMargin: '-100px 0px -55% 0px' },
+    );
+    targets.forEach((target) => observer.observe(target.el));
+
+    // The footer is too short to reach the reading band at the page end.
+    if (ids.includes('contact')) {
+      window.addEventListener(
+        'scroll',
+        () => {
+          const atEnd =
+            window.innerHeight + window.scrollY >=
+            document.documentElement.scrollHeight - 2;
+          if (atEnd) mark('contact');
+        },
+        { passive: true },
+      );
+    }
+  }
+</script>

@@ -1,0 +1,209 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Static checks and the build run in parallel; every job that needs the
+  # built site depends on `build` only, so Lighthouse, browser tests and links
+  # start as soon as dist exists.
+  checks:
+    name: Format, lint, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm test
+
+  build:
+    # `pnpm build` runs `astro check` (typecheck) before `astro build`.
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
+
+  e2e:
+    name: Browser tests
+    needs: build
+    runs-on: ubuntu-latest
+    # Official Playwright image: Chromium and its system deps are preinstalled,
+    # so CI does not depend on the Ubuntu apt mirrors. Keep the tag in sync with
+    # @playwright/test in package.json (Renovate groups both updates).
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - run: pnpm test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse (${{ matrix.preset }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      # Mobile and desktop are independent: run both and report both.
+      fail-fast: false
+      matrix:
+        preset: [mobile, desktop]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Lighthouse
+        run: pnpm exec lhci autorun
+        env:
+          AUDIT_PRESET: ${{ matrix.preset }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: lighthouse-reports-${{ matrix.preset }}
+          path: lhci-reports
+          if-no-files-found: warn
+          retention-days: 14
+
+  links:
+    name: Links
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}
+          restore-keys: lychee-
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          # Own-site absolute URLs (canonical, hreflang) are checked against this
+          # build, not production: a PR's new pages are not deployed yet.
+          # The weekly workflow checks production itself.
+          args: >-
+            --config lychee.toml
+            --root-dir "${{ github.workspace }}/dist"
+            --remap '^https://alfonsoramos\.dev/(.*)$ file://${{ github.workspace }}/dist/$1'
+            --index-files index.html
+            './dist/**/*.html'
+          fail: true
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    needs: [checks, build, e2e, lighthouse, links]
+    runs-on: ubuntu-latest
+    # Fork PRs get no secrets; skip them.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
+    steps:
+      - name: Check Cloudflare secrets
+        id: secrets
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are not set; skipping deploy."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.secrets.outputs.present == 'true'
+        with:
+          name: dist
+          path: dist
+      - uses: actions/setup-node@v4
+        if: steps.secrets.outputs.present == 'true'
+        with:
+          node-version: 26
+      - name: Deploy
+        id: deploy
+        if: steps.secrets.outputs.present == 'true'
+        run: |
+          npx --yes wrangler@4 pages deploy dist \
+            --project-name=alfonsoramos-portfolio \
+            --branch="$BRANCH" \
+            --commit-dirty=true | tee deploy.log
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.pages\.dev' deploy.log | tail -1)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Comment preview URL
+        if: steps.secrets.outputs.present == 'true' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+        with:
+          script: |
+            const marker = '<!-- cloudflare-pages-preview -->';
+            const body = `${marker}\nCloudflare Pages preview: ${process.env.PREVIEW_URL}\n\nCommit: ${context.sha.slice(0, 7)}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

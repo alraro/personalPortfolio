@@ -1,0 +1,45 @@
+---
+// Secondary link icons shared by both ProjectCard variants. They sit above the
+// whole-card link (z-10), so there are no nested anchors.
+import type { Project } from '../lib/catalogue/core';
+import { t, type Locale } from '../i18n';
+import Icon from './Icon.astro';
+import Link from './Link.astro';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+const { project, locale } = Astro.props;
+
+const linkIcons = {
+  repository: 'Code',
+  website: 'Globe',
+  demo: 'Play',
+  paper: 'FileText',
+} as const;
+
+const linkName = (type: string) =>
+  t(locale, 'project.linkName')
+    .replace('{type}', type)
+    .replace('{title}', project.title);
+---
+
+{project.secondaryLinks.length > 0 && (
+  <ul class="relative z-10 flex gap-4 text-xl">
+    {project.secondaryLinks.map((link) => (
+      <li>
+        <Link
+          href={link.url}
+          locale={locale}
+          bare
+          iconOnly
+          class="inline-flex text-text-muted transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-accent"
+        >
+          <Icon name={linkIcons[link.type]} />
+          <span class="sr-only">{linkName(link.label)}</span>
+        </Link>
+      </li>
+    ))}
+  </ul>
+)}

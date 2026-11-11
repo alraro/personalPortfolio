@@ -1,0 +1,99 @@
+---
+import '../styles/global.css';
+import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
+import ThemeHead from '../components/ThemeHead.astro';
+import { SITE_URL } from '../lib/seo';
+import { locales, switchLocalePath, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  noindex?: boolean;
+  /** Canonical, hreflang and Open Graph tags. The 404 page turns them off. */
+  alternates?: boolean;
+  /** schema.org data, serialized as JSON-LD (home pages only). */
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  locale,
+  title,
+  description,
+  noindex = false,
+  alternates = true,
+  jsonLd,
+} = Astro.props;
+const site = Astro.site ?? new URL(SITE_URL);
+const absolute = (path: string) => new URL(path, site).href;
+const pathname = Astro.url.pathname;
+const ogLocales: Record<Locale, string> = { en: 'en_US', es: 'es_ES' };
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ThemeHead />
+    <link
+      rel="preload"
+      href={frauncesLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="author" content="Alfonso Ramos Rojas" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    {alternates && (
+      <>
+        <link rel="canonical" href={absolute(pathname)} />
+        {locales.map((target) => (
+          <link
+            rel="alternate"
+            hreflang={target}
+            href={absolute(switchLocalePath(pathname, target))}
+          />
+        ))}
+        <link rel="alternate" hreflang="x-default" href={SITE_URL} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Alfonso Ramos Rojas" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={absolute(pathname)} />
+        <meta property="og:image" content={absolute(`/og/${locale}.png`)} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={t(locale, 'meta.ogAlt')} />
+        <meta property="og:locale" content={ogLocales[locale]} />
+        {locales
+          .filter((target) => target !== locale)
+          .map((target) => (
+            <meta property="og:locale:alternate" content={ogLocales[target]} />
+          ))}
+        <meta name="twitter:card" content="summary_large_image" />
+      </>
+    )}
+    {jsonLd && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(jsonLd).replaceAll('<', '\\u003c')}
+      />
+    )}
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-accent-contrast"
+    >
+      {t(locale, 'skip.toContent')}
+    </a>
+    <slot />
+  </body>
+</html>

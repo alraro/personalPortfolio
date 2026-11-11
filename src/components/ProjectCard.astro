@@ -1,0 +1,123 @@
+---
+import type { Project } from '../lib/catalogue/core';
+import type { Locale } from '../i18n';
+import AwardBadge from './AwardBadge.astro';
+import ProjectCardLinks from './ProjectCardLinks.astro';
+import ProjectCardMedia from './ProjectCardMedia.astro';
+import ProjectCardTags from './ProjectCardTags.astro';
+import ProjectCardTitle from './ProjectCardTitle.astro';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  variant?: 'featured' | 'compact';
+  /** Featured only: which column holds the media on screens >= 768 px. */
+  side?: 'media-right' | 'media-left';
+  class?: string;
+}
+
+const {
+  project,
+  locale,
+  variant = 'featured',
+  side = 'media-right',
+  class: className,
+} = Astro.props;
+
+const base =
+  'group relative rounded-lg border border-border bg-background p-4 transition-[border-color,transform] duration-(--duration-base) ease-(--ease-standard) focus-within:border-accent hover:border-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+const layout = {
+  featured:
+    'grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-16 md:p-6 md:hover:-translate-y-1',
+  compact: 'flex h-full flex-col gap-4 hover:-translate-y-1',
+};
+---
+
+{/* The title link's ::after covers the whole card (whole-card link). Secondary
+    links sit above it (z-10), so there are no nested anchors. */}
+<article
+  id={`project-${project.slug}`}
+  data-project-card
+  data-variant={variant}
+  data-side={variant === 'featured' ? side : undefined}
+  class:list={[base, layout[variant], className]}
+>
+  {variant === 'featured' ? (
+    <>
+      <div class:list={['min-w-0', side === 'media-right' && 'md:order-2']}>
+        <ProjectCardMedia project={project} />
+      </div>
+      <div class="flex min-w-0 flex-col gap-4">
+        {project.award && (
+          <AwardBadge
+            award={project.award.text}
+            eventName={project.award.eventName}
+            class="self-start"
+          />
+        )}
+        <ProjectCardTitle
+          project={project}
+          locale={locale}
+          titleClass="text-3xl"
+        />
+        <div class="prose" set:html={project.descriptionHtml} />
+        <ProjectCardTags tags={project.tags} />
+        <ProjectCardLinks project={project} locale={locale} />
+      </div>
+    </>
+  ) : (
+    <>
+      <ProjectCardMedia project={project} />
+      <ProjectCardTitle
+        project={project}
+        locale={locale}
+        titleClass="text-2xl"
+      />
+      <ProjectCardTags tags={project.tags} />
+      {/* Award slot: shows the inherited Award unless a caller overrides it. */}
+      <slot name="award">
+        {project.award && (
+          <AwardBadge
+            award={project.award.text}
+            eventName={project.award.eventName}
+            class="self-start"
+          />
+        )}
+      </slot>
+      <div class="mt-auto">
+        <ProjectCardLinks project={project} locale={locale} />
+      </div>
+    </>
+  )}
+</article>
+
+<style>
+  .prose :global(p) {
+    color: var(--color-text);
+    line-height: 1.65;
+  }
+  .prose :global(p + p) {
+    margin-top: 0.75rem;
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0 0.25em;
+  }
+  .prose :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .prose :global(strong) {
+    font-weight: 600;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+</style>

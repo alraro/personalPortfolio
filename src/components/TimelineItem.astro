@@ -1,0 +1,37 @@
+---
+import type { TimelineItemData } from '../lib/catalogue/timeline';
+import type { Locale } from '../i18n';
+import Link from './Link.astro';
+
+interface Props {
+  item: TimelineItemData;
+  locale: Locale;
+}
+const { item, locale } = Astro.props;
+---
+
+<!-- Renders an <li>: place it inside an <ol>. -->
+<li class="relative border-l-2 border-border pb-8 pl-6 last:pb-0">
+  <span
+    aria-hidden="true"
+    class="absolute top-1.5 -left-[7px] size-3 rounded-full bg-accent"
+  ></span>
+  <p class="font-mono text-sm text-text-muted">{item.dateRange}</p>
+  <h4 class="font-display text-xl font-semibold">{item.title}</h4>
+  <p>
+    {item.organizationUrl ? (
+      <Link href={item.organizationUrl} locale={locale}>
+        {item.organization}
+      </Link>
+    ) : (
+      item.organization
+    )}
+  </p>
+  <p class="text-sm text-text-muted">{item.location}</p>
+  {item.descriptionHtml && (
+    <div
+      class="mt-2 max-w-prose [&_p+p]:mt-2"
+      set:html={item.descriptionHtml}
+    />
+  )}
+</li>

@@ -1,0 +1,208 @@
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+import { LINK_TYPES } from './lib/catalogue/core';
+import { EVENT_DATE, EVENT_ROLES } from './lib/catalogue/events';
+
+// Id = path without extension, e.g. "minirt/meta" or "minirt/es".
+// The adapter in src/lib/catalogue/index.ts splits it into slug and locale.
+const generateId = ({ entry }: { entry: string }) =>
+  entry.replace(/\.(?:ya?ml|md)$/, '');
+
+const link = z.strictObject({
+  type: z.enum(LINK_TYPES),
+  url: z
+    .url()
+
+    .refine((url) => url.startsWith('https://'), 'must be an https:// URL'),
+});
+
+/** `src/content/projects/<slug>/meta.yaml`: data shared by both languages. */
+const projectMeta = defineCollection({
+  loader: glob({
+    base: './src/content/projects',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: ({ image }) =>
+    z.strictObject({
+      order: z.number().int().min(1),
+      featured: z.boolean(),
+      tags: z.array(z.string().min(1).max(24)).min(1).max(6),
+      links: z
+        .strictObject({
+          primary: link,
+          secondary: z.array(link).max(3).optional(),
+        })
+        .superRefine((links, ctx) => {
+          if (links.secondary?.some((l) => l.url === links.primary.url)) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'secondary links must not repeat the primary URL',
+              path: ['secondary'],
+            });
+          }
+        }),
+      // Image files live inside the Project folder (relative paths); video
+      // files live under public/media/projects/<slug>/ (checked by the core).
+      media: z
+        .discriminatedUnion('kind', [
+          z.strictObject({ kind: z.literal('image'), src: image() }),
+          z.strictObject({
+            kind: z.literal('video'),
+            mp4: z.string(),
+            webm: z.string().optional(),
+            poster: image(),
+          }),
+        ])
+        .optional(),
+    }),
+});
+
+/** `src/content/projects/<slug>/{en,es}.md`: localized fields + long description. */
+const projectText = defineCollection({
+  loader: glob({
+    base: './src/content/projects',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    title: z.string().min(1).max(60),
+    subtitle: z.string().min(1).max(120),
+    mediaAlt: z.string().min(1).max(160).optional(),
+  }),
+});
+
+/** `src/content/profile/meta.yaml`: the Owner's data shared by both languages. */
+const profileMeta = defineCollection({
+  loader: glob({
+    base: './src/content/profile',
+    pattern: 'meta.yaml',
+    generateId,
+  }),
+  schema: ({ image }) =>
+    z.strictObject({
+      name: z.string().min(1),
+      photo: image(),
+      github: z.url(),
+      linkedin: z.url(),
+      email: z.email(),
+    }),
+});
+
+/** `src/content/profile/{en,es}.md`: headline, photo alt text and About body. */
+const profileText = defineCollection({
+  loader: glob({
+    base: './src/content/profile',
+    pattern: '{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    headline: z.string().min(1).max(120),
+    photoAlt: z.string().min(1).max(120),
+  }),
+});
+
+const yearMonth = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM');
+const httpsUrl = z
+  .url()
+  .refine((url) => url.startsWith('https://'), 'must be an https:// URL');
+
+// Experience and Education: `src/content/<kind>/<slug>/{meta.yaml,en.md,es.md}`.
+// Cross-field rules (end >= start) are checked by the catalogue core, which
+// reports every problem at once.
+const experienceMeta = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    organization: z.string().min(1).max(80),
+    organizationUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const experienceText = defineCollection({
+  loader: glob({
+    base: './src/content/experience',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    role: z.string().min(1).max(80),
+    organization: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
+  }),
+});
+const educationMeta = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    institution: z.string().min(1).max(80),
+    institutionUrl: httpsUrl.optional(),
+    location: z.string().min(1).max(60),
+    start: yearMonth,
+    end: yearMonth.nullable(),
+  }),
+});
+const educationText = defineCollection({
+  loader: glob({
+    base: './src/content/education',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    programme: z.string().min(1).max(100),
+    institution: z.string().min(1).max(80).optional(),
+    location: z.string().min(1).max(60).optional(),
+  }),
+});
+
+/** `src/content/events/<slug>/meta.yaml`: data shared by both languages. */
+const eventMeta = defineCollection({
+  loader: glob({
+    base: './src/content/events',
+    pattern: '*/meta.yaml',
+    generateId,
+  }),
+  schema: z.strictObject({
+    date: z.string().regex(EVENT_DATE, 'must be YYYY-MM or YYYY-MM-DD'),
+    role: z.enum(EVENT_ROLES),
+    url: httpsUrl.optional(),
+    project: z.string().min(1).optional(),
+  }),
+});
+
+/** `src/content/events/<slug>/{en,es}.md`: localized fields + optional note. */
+const eventText = defineCollection({
+  loader: glob({
+    base: './src/content/events',
+    pattern: '*/{en,es}.md',
+    generateId,
+  }),
+  schema: z.strictObject({
+    name: z.string().min(1).max(80),
+    award: z.string().min(1).max(40).optional(),
+  }),
+});
+
+export const collections = {
+  eventMeta,
+  eventText,
+  projectMeta,
+  projectText,
+  profileMeta,
+  profileText,
+  experienceMeta,
+  experienceText,
+  educationMeta,
+  educationText,
+};

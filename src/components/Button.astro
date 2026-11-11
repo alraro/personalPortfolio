@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'class'> {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md';
+  href?: string;
+  /** Icon name shown before the label (Lucide unless `iconSource` says otherwise). */
+  icon?: string;
+  iconSource?: 'lucide' | 'simple' | 'custom';
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  icon,
+  iconSource,
+  type = 'button',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  primary:
+    'border-accent bg-accent text-accent-contrast hover:bg-transparent hover:text-accent',
+  secondary:
+    'border-border bg-surface text-text hover:border-accent hover:text-accent',
+  ghost: 'border-transparent bg-transparent text-text hover:text-accent',
+};
+const sizes = {
+  sm: 'gap-1.5 px-3 py-1.5 text-sm',
+  md: 'gap-2 px-5 py-2.5 text-base',
+};
+const classes = [
+  'inline-flex items-center justify-center rounded-md border font-mono font-normal',
+  'transition-colors duration-(--duration-fast) ease-(--ease-standard)',
+  variants[variant],
+  sizes[size],
+  className,
+];
+---
+
+{href ? (
+  <a href={href} data-button={variant} class:list={classes} {...rest}>
+    {icon && <Icon source={iconSource} name={icon} />}
+    <slot />
+  </a>
+) : (
+  <button type={type} data-button={variant} class:list={classes} {...rest}>
+    {icon && <Icon source={iconSource} name={icon} />}
+    <slot />
+  </button>
+)}

@@ -1,0 +1,19 @@
+---
+interface Props {
+  id: string;
+  /** Optional monospaced eyebrow above the heading, for example "01". */
+  eyebrow?: string;
+  class?: string;
+}
+const { id, eyebrow, class: className } = Astro.props;
+---
+
+<div class={className}>
+  {eyebrow && <p class="font-mono text-sm text-accent">{eyebrow}</p>}
+  <h2
+    id={id}
+    class="scroll-mt-24 font-display text-3xl leading-(--leading-display) font-semibold tracking-(--tracking-display)"
+  >
+    <slot />
+  </h2>
+</div>

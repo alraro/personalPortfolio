@@ -1,0 +1,16 @@
+---
+// Seam between ProjectCard and the Project's Media. Both card variants render
+// their Media through this component (wrapper `data-project-media` is used by
+// tests).
+import type { Project } from '../lib/catalogue/core';
+import ProjectMedia from './ProjectMedia.astro';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+---
+
+<div data-project-media class="min-w-0">
+  <ProjectMedia media={project.media} />
+</div>

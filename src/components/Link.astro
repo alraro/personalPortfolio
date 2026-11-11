@@ -1,0 +1,53 @@
+---
+import { isExternalHref } from '../lib/links';
+import { SITE_URL } from '../lib/seo';
+import { t, type Locale } from '../i18n';
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  locale: Locale;
+  /** Drops the default accent/underline look; the caller styles the link. */
+  bare?: boolean;
+  /** Hides the visible external-link arrow (for icon-only links). The hidden
+   *  "(opens in a new tab)" notice stays. */
+  iconOnly?: boolean;
+  class?: string;
+}
+
+const {
+  href,
+  locale,
+  bare = false,
+  iconOnly = false,
+  class: className,
+  ...rest
+} = Astro.props;
+const site = Astro.site?.href ?? SITE_URL;
+const external = isExternalHref(href, site);
+---
+
+<a
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  class:list={[
+    !bare &&
+      'text-accent underline decoration-1 underline-offset-4 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:decoration-2',
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+  {external && (
+    <>
+      {!iconOnly && (
+        <Icon
+          name="ExternalLink"
+          class="ml-1 inline align-[-0.1em] text-[0.85em]"
+        />
+      )}
+      <span class="sr-only">{t(locale, 'link.opensInNewTab')}</span>
+    </>
+  )}
+</a>

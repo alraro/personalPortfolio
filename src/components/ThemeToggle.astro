@@ -1,0 +1,75 @@
+---
+import { t, type Locale } from '../i18n';
+import Icon from './Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+// Labels for both states ship in the page; the script swaps them.
+const labels = {
+  dark: t(locale, 'theme.switchToLight'),
+  light: t(locale, 'theme.switchToDark'),
+};
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  data-label-dark={labels.dark}
+  data-label-light={labels.light}
+  aria-label={labels.dark}
+  class="inline-flex size-10 items-center justify-center rounded-md border border-border bg-surface text-lg text-text transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:border-accent hover:text-accent"
+>
+  {/* Shows the theme the button switches to: sun in dark, moon in light. */}
+  <Icon name="Sun" class="hidden [:root[data-theme=dark]_&]:block" />
+  <Icon name="Moon" class="hidden [:root[data-theme=light]_&]:block" />
+</button>
+
+<script>
+  import {
+    THEME_STORAGE_KEY,
+    applyTheme,
+    oppositeTheme,
+    type Theme,
+  } from '../lib/theme';
+
+  const current = (): Theme =>
+    document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  function syncLabel(button: HTMLElement) {
+    const label =
+      current() === 'dark'
+        ? button.dataset.labelDark
+        : button.dataset.labelLight;
+    if (label) button.setAttribute('aria-label', label);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>('[data-theme-toggle]')
+    .forEach((button) => {
+      syncLabel(button);
+      button.addEventListener('click', () => {
+        const next = oppositeTheme(current());
+        applyTheme(next);
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, next);
+        } catch {
+          // Storage may be unavailable; the theme still changes for this visit.
+        }
+        document
+          .querySelectorAll<HTMLElement>('[data-theme-toggle]')
+          .forEach(syncLabel);
+      });
+    });
+
+  // Keep the label right when the system preference changes the theme live.
+  new MutationObserver(() =>
+    document
+      .querySelectorAll<HTMLElement>('[data-theme-toggle]')
+      .forEach(syncLabel),
+  ).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+</script>

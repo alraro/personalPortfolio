@@ -1,0 +1,52 @@
+---
+import { locales, switchLocalePath, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const items = locales.map((target) => ({
+  target,
+  href: switchLocalePath(Astro.url.pathname, target),
+  short: t(locale, `language.${target}.short`),
+  name: t(locale, `language.${target}.name`),
+  current: target === locale,
+}));
+---
+
+<nav aria-label={t(locale, 'language.switchLabel')}>
+  <ul class="flex gap-3">
+    {items.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          hreflang={item.target}
+          lang={item.target}
+          aria-current={item.current ? 'true' : undefined}
+          data-lang-choice={item.target}
+          class="rounded-sm px-1 font-mono text-sm text-text-muted underline-offset-4 transition-colors duration-(--duration-fast) ease-(--ease-standard) hover:text-text hover:underline aria-[current=true]:font-semibold aria-[current=true]:text-accent"
+        >
+          <span aria-hidden="true">{item.short}</span>
+          <span class="sr-only">{item.name}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  import { LANG_STORAGE_KEY } from '../i18n/locale';
+
+  document
+    .querySelectorAll<HTMLAnchorElement>('a[data-lang-choice]')
+    .forEach((link) => {
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(LANG_STORAGE_KEY, link.dataset.langChoice ?? '');
+        } catch {
+          // Storage may be unavailable; the switch still navigates.
+        }
+      });
+    });
+</script>

@@ -1,0 +1,75 @@
+---
+import About from '../../components/About.astro';
+import ExperienceEducation from '../../components/ExperienceEducation.astro';
+import FeaturedProjects from '../../components/FeaturedProjects.astro';
+import Hero from '../../components/Hero.astro';
+import Events from '../../components/Events.astro';
+import MoreProjects from '../../components/MoreProjects.astro';
+import Footer from '../../components/Footer.astro';
+import Nav from '../../components/Nav.astro';
+import LocaleLayout from '../../layouts/LocaleLayout.astro';
+import { locales, t, type Locale } from '../../i18n';
+import {
+  getEducation,
+  getEvents,
+  getExperience,
+  getFeaturedProjects,
+  getMoreProjects,
+} from '../../lib/catalogue';
+import { getImage } from 'astro:assets';
+import { buildNavItems } from '../../lib/nav';
+import { buildPersonJsonLd } from '../../lib/seo';
+import { getProfile } from '../../lib/profile';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = Astro.params.locale as Locale;
+const [profile, experience, education, projects, moreProjects, events] =
+  await Promise.all([
+    getProfile(locale),
+    getExperience(locale),
+    getEducation(locale),
+    getFeaturedProjects(locale),
+    getMoreProjects(locale),
+    getEvents(locale),
+  ]);
+// Only link to the sections that are rendered (each hides itself when empty).
+const navItems = buildNavItems({
+  about: true,
+  experience: experience.length > 0 || education.length > 0,
+  projects: projects.length > 0,
+  moreProjects: moreProjects.length > 0,
+  events: events.length > 0,
+  contact: true,
+});
+const photo = await getImage({ src: profile.photo, width: 460, format: 'jpg' });
+const jsonLd = buildPersonJsonLd({
+  headline: profile.headline,
+  image: new URL(photo.src, Astro.site).href,
+});
+---
+
+<LocaleLayout
+  locale={locale}
+  title={t(locale, 'meta.title.home')}
+  description={t(locale, 'meta.description')}
+  jsonLd={jsonLd}
+>
+  <Nav locale={locale} name={profile.name} items={navItems} />
+  <main id="main" tabindex="-1" class="focus:outline-none">
+    <Hero locale={locale} profile={profile} />
+    <About locale={locale} html={profile.aboutHtml} />
+    <ExperienceEducation locale={locale} />
+    <FeaturedProjects locale={locale} />
+    <MoreProjects locale={locale} />
+    <Events locale={locale} />
+  </main>
+  <Footer
+    locale={locale}
+    github={profile.github}
+    linkedin={profile.linkedin}
+    email={profile.email}
+  />
+</LocaleLayout>

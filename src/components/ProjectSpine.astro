@@ -1,0 +1,78 @@
+---
+// Decorative vertical line with a node dot per item. Children must be <li>
+// elements (one ProjectCard each). The line draws itself on scroll with CSS
+// scroll-driven animations; where unsupported, or with reduced motion, it is a
+// static full line. No JavaScript.
+interface Props {
+  /** Accessible name of the list. */
+  label: string;
+  class?: string;
+}
+const { label, class: className } = Astro.props;
+---
+
+<div class:list={['spine relative', className]}>
+  <span class="spine-line" aria-hidden="true"></span>
+  <ol aria-label={label} class="flex flex-col gap-12 pl-8 md:gap-16 md:pl-0">
+    <slot />
+  </ol>
+</div>
+
+<style>
+  .spine-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0.5rem;
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--color-border);
+    transform-origin: top;
+  }
+  .spine > ol > :global(li) {
+    position: relative;
+  }
+  /* Node dot level with the card's heading, on the spine. */
+  .spine > ol > :global(li)::before {
+    content: '';
+    position: absolute;
+    top: 2.25rem;
+    left: -2rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-left: calc(0.5rem - 0.375rem);
+    border-radius: 9999px;
+    background-color: var(--color-accent);
+    border: 2px solid var(--color-background);
+    box-sizing: content-box;
+  }
+
+  @media (min-width: 768px) {
+    .spine-line {
+      left: 50%;
+    }
+    .spine > ol > :global(li)::before {
+      left: 50%;
+      margin-left: -0.375rem;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .spine-line {
+        animation: spine-draw linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 80%;
+      }
+    }
+  }
+
+  @keyframes spine-draw {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+</style>

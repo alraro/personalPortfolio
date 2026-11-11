@@ -1,0 +1,16 @@
+# TODO(owner): draft copy derived from the public repository README, review before publishing.
+# The last paragraph (what I learned) is inferred from the README; confirm or rewrite it.
+order: 2
+featured: true
+tags:
+  - C
+  - Ray tracing
+  - pthreads
+  - '42'
+media:
+  kind: image
+  src: ./media.png
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/miniRT

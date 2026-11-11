@@ -1,0 +1,33 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  photo: ImageMetadata;
+  alt: string;
+  /** Above the fold: load eagerly with high priority. */
+  priority?: boolean;
+  class?: string;
+}
+
+const { photo, alt, priority = false, class: className } = Astro.props;
+---
+
+<div
+  data-profile-photo
+  class:list={[
+    'profile-photo relative isolate aspect-square overflow-hidden rounded-lg outline-1 outline-offset-4 outline-border',
+    className,
+  ]}
+>
+  <Picture
+    src={photo}
+    alt={alt}
+    formats={['avif', 'webp']}
+    widths={[288, 460]}
+    sizes="(min-width: 1024px) 18rem, 14rem"
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    class="size-full object-cover"
+  />
+</div>

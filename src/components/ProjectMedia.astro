@@ -1,0 +1,128 @@
+---
+// Media of a Project in the 16:10 cover frame: an optimised image, a short
+// silent looping video with a poster, or (without Media) the generated cover.
+// Videos never autoplay: they play on hover/focus of the whole card on desktop,
+// when scrolled into view on touch devices, and never under reduced motion.
+import { Picture, getImage } from 'astro:assets';
+import type { ProjectMedia } from '../lib/catalogue/core';
+import GeneratedCover from './GeneratedCover.astro';
+
+interface Props {
+  media: ProjectMedia;
+  class?: string;
+}
+const { media, class: className } = Astro.props;
+
+const frame =
+  'relative aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface';
+const widths = [400, 800, 1200];
+const sizes = '(min-width: 768px) 480px, 100vw';
+
+const posterUrl =
+  media.kind === 'video'
+    ? (
+        await getImage({
+          src: media.poster,
+          width: 800,
+          format: 'webp',
+        })
+      ).src
+    : undefined;
+---
+
+{media.kind === 'generated' && (
+  <GeneratedCover
+    title={media.title}
+    tagline={media.tagline}
+    class={className}
+  />
+)}
+{media.kind === 'image' && (
+  <div data-media-kind="image" class:list={[frame, className]}>
+    <Picture
+      src={media.image}
+      alt={media.alt}
+      formats={['avif', 'webp']}
+      widths={widths}
+      sizes={sizes}
+      loading="lazy"
+      decoding="async"
+      class="h-full w-full object-cover"
+    />
+  </div>
+)}
+{media.kind === 'video' && (
+  <div
+    data-media-kind="video"
+    role="img"
+    aria-label={media.alt}
+    class:list={[frame, className]}
+  >
+    <video
+      data-project-media-video
+      aria-hidden="true"
+      tabindex="-1"
+      muted
+      loop
+      playsinline
+      preload="none"
+      poster={posterUrl}
+      width={media.poster.width}
+      height={media.poster.height}
+      class="h-full w-full object-cover"
+    >
+      {media.webm && <source src={media.webm} type="video/webm" />}
+      {media.mp4 && <source src={media.mp4} type="video/mp4" />}
+    </video>
+  </div>
+)}
+
+<script>
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  function play(video: HTMLVideoElement) {
+    if (reducedMotion.matches) return;
+    video.play().catch(() => {});
+  }
+  function stop(video: HTMLVideoElement, reset: boolean) {
+    video.pause();
+    if (reset) video.currentTime = 0;
+  }
+
+  const videos = document.querySelectorAll<HTMLVideoElement>(
+    'video[data-project-media-video]',
+  );
+
+  videos.forEach((video) => {
+    // Each video is independent. The trigger is the whole card when inside
+    // one, otherwise the media frame itself.
+    const trigger =
+      video.closest<HTMLElement>('[data-project-card]') ?? video.parentElement!;
+
+    reducedMotion.addEventListener('change', () => {
+      if (reducedMotion.matches) stop(video, false);
+    });
+
+    if (desktop.matches) {
+      trigger.addEventListener('pointerenter', () => play(video));
+      trigger.addEventListener('focusin', () => play(video));
+      trigger.addEventListener('pointerleave', () => stop(video, true));
+      trigger.addEventListener('focusout', (event) => {
+        if (!trigger.contains(event.relatedTarget as Node | null)) {
+          stop(video, true);
+        }
+      });
+    } else {
+      new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) play(video);
+            else stop(video, false);
+          }
+        },
+        { threshold: 0.6 },
+      ).observe(video);
+    }
+  });
+</script>

@@ -1,0 +1,13 @@
+# TODO(owner): draft copy derived from the public repository code (it has no README), review before publishing.
+# Motivation and what I learned are not stated in the repository; the last paragraph is inferred from commit history.
+order: 3
+featured: true
+tags:
+  - C++
+  - Monte Carlo
+  - Multithreading
+  - Dear ImGui
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/monopoly-montecarlo-simulation

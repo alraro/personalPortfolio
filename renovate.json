@@ -28,6 +28,7 @@
       "description": "Automerge patch updates of devDependencies once CI is green",
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch"],
+      "groupName": "devDependency patch updates",
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": false

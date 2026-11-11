@@ -1,9 +1,16 @@
 ---
 import Button from '../../components/Button.astro';
 import GeneratedCover from '../../components/GeneratedCover.astro';
+import ProjectMedia from '../../components/ProjectMedia.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import ProjectSpine from '../../components/ProjectSpine.astro';
-import type { Project } from '../../lib/catalogue/core';
+import type {
+  Project,
+  ProjectMedia as Media,
+  GeneratedCover as GeneratedCoverModel,
+} from '../../lib/catalogue/core';
+import samplePoster from '../../assets/design-system/sample-poster.png';
+import sampleImage from '../../assets/design-system/sample-image.png';
 import Icon from '../../components/Icon.astro';
 import LanguageSwitch from '../../components/LanguageSwitch.astro';
 import Link from '../../components/Link.astro';
@@ -71,7 +78,11 @@ const variants = [
 ] as const;
 const sizes = ['sm', 'md'] as const;
 
-const sampleProject = (slug: string, title: string): Project => ({
+const sampleProject = (
+  slug: string,
+  title: string,
+  media?: Media,
+): Project => ({
   slug,
   title,
   subtitle: t(locale, 'ds.sample'),
@@ -94,12 +105,26 @@ const sampleProject = (slug: string, title: string): Project => ({
       label: t(locale, 'linkType.paper'),
     },
   ],
-  cover: {
+  media: media ?? {
     kind: 'generated',
     title,
     tagline: ['C', 'Ray tracing', '42'].join(' · '),
   },
 });
+const sampleAlt = t(locale, 'ds.mediaAlt');
+const imageMedia: Media = {
+  kind: 'image',
+  image: sampleImage,
+  alt: sampleAlt,
+};
+const videoMedia: Media = {
+  kind: 'video',
+  mp4: '/media/projects/design-system/sample.mp4',
+  webm: '/media/projects/design-system/sample.webm',
+  poster: samplePoster,
+  alt: sampleAlt,
+};
+const demoVideo = sampleProject('ds-video', 'Video Project', videoMedia);
 const demoRight = sampleProject('ds-right', 'Sample Project');
 const demoLeft = sampleProject('ds-left', 'Another Project');
 const spineA = sampleProject('ds-spine-a', 'Spine one');
@@ -126,6 +151,16 @@ const sampleTimeline: TimelineItemData[] = [
 ];
 
 const compactCover = sampleProject('ds-compact-cover', 'Compact cover');
+const compactImage = sampleProject(
+  'ds-compact-image',
+  'Compact image',
+  imageMedia,
+);
+const compactVideo = sampleProject(
+  'ds-compact-video',
+  'Compact video',
+  videoMedia,
+);
 const compactGrid = [
   sampleProject('ds-grid-a', 'Grid one'),
   sampleProject('ds-grid-b', 'Grid two'),
@@ -419,8 +454,8 @@ const card = 'rounded-lg border border-border bg-surface p-5';
         </h3>
         <div class="max-w-md">
           <GeneratedCover
-            title={demoRight.cover.title}
-            tagline={demoRight.cover.tagline}
+            title={(demoRight.media as GeneratedCoverModel).title}
+            tagline={(demoRight.media as GeneratedCoverModel).tagline}
           />
         </div>
       </div>
@@ -439,6 +474,24 @@ const card = 'rounded-lg border border-border bg-surface p-5';
 
       <div class:list={[card, 'flex flex-col gap-4']}>
         <h3 class="font-display text-xl font-semibold">
+          {t(locale, 'ds.projectMedia')}
+        </h3>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaImage')}
+        </code>
+        <div class="max-w-md" id="ds-media-image">
+          <ProjectMedia media={imageMedia} />
+        </div>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaVideo')}
+        </code>
+        <div class="max-w-md" id="ds-media-video">
+          <ProjectMedia media={videoMedia} />
+        </div>
+      </div>
+
+      <div class:list={[card, 'flex flex-col gap-4']}>
+        <h3 class="font-display text-xl font-semibold">
           {t(locale, 'ds.projectCard')}
         </h3>
         <code class="font-mono text-xs text-text-muted">
@@ -449,6 +502,10 @@ const card = 'rounded-lg border border-border bg-surface p-5';
           {t(locale, 'ds.projectCardMediaLeft')}
         </code>
         <ProjectCard project={demoLeft} locale={locale} side="media-left" />
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectCardVideo')}
+        </code>
+        <ProjectCard project={demoVideo} locale={locale} side="media-right" />
       </div>
 
       <div class:list={[card, 'flex flex-col gap-4']}>
@@ -461,6 +518,26 @@ const card = 'rounded-lg border border-border bg-surface p-5';
         <div class="max-w-sm">
           <ProjectCard
             project={compactCover}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaImage')}
+        </code>
+        <div class="max-w-sm">
+          <ProjectCard
+            project={compactImage}
+            locale={locale}
+            variant="compact"
+          />
+        </div>
+        <code class="font-mono text-xs text-text-muted">
+          {t(locale, 'ds.projectMediaVideo')}
+        </code>
+        <div class="max-w-sm">
+          <ProjectCard
+            project={compactVideo}
             locale={locale}
             variant="compact"
           />

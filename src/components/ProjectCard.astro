@@ -36,6 +36,7 @@ const layout = {
     links sit above it (z-10), so there are no nested anchors. */}
 <article
   id={`project-${project.slug}`}
+  data-project-card
   data-variant={variant}
   data-side={variant === 'featured' ? side : undefined}
   class:list={[base, layout[variant], className]}

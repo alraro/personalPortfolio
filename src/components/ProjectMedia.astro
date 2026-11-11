@@ -72,7 +72,7 @@ const posterUrl =
       class="h-full w-full object-cover"
     >
       {media.webm && <source src={media.webm} type="video/webm" />}
-      <source src={media.mp4} type="video/mp4" />
+      {media.mp4 && <source src={media.mp4} type="video/mp4" />}
     </video>
   </div>
 )}

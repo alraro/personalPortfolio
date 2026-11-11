@@ -110,7 +110,8 @@ export type ProjectMedia =
   | { kind: 'image'; image: ImageAsset; alt: string }
   | {
       kind: 'video';
-      mp4: string;
+      /** Optional in the view model only; content (`meta.yaml`) requires it. */
+      mp4?: string;
       webm?: string;
       poster: ImageAsset;
       alt: string;

@@ -1,6 +1,6 @@
 # TODO(owner): draft copy derived from the public repository README and code, review before publishing.
-order: 4
-featured: true
+order: 5
+featured: false
 tags:
   - C
   - '42'

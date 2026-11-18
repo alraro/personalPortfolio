@@ -1,7 +1,7 @@
 # TODO(owner): draft copy derived from the public repository code (it has no README), review before publishing.
 # Motivation and what I learned are not stated in the repository; the last paragraph is inferred from commit history.
-order: 3
-featured: true
+order: 6
+featured: false
 tags:
   - C++
   - Monte Carlo

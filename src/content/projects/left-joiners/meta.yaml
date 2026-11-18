@@ -1,0 +1,16 @@
+# TODO(owner): draft copy from the team's LinkedIn posts and the analysis repository, review before publishing.
+# Tell the teammate who owns the site repository that it is linked from here.
+order: 8
+featured: false
+tags:
+  - Python
+  - pandas
+  - Data analysis
+  - Astro
+links:
+  primary:
+    type: website
+    url: https://leftjoiners-hackaton2025.vercel.app
+  secondary:
+    - type: repository
+      url: https://github.com/alraro/HackatonDataAnalysis2025

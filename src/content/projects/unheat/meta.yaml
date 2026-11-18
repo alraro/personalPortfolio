@@ -1,0 +1,16 @@
+# TODO(owner): draft copy from the repository README and commit history, review before publishing.
+order: 2
+featured: true
+tags:
+  - Python
+  - Computer vision
+  - Sentinel-2
+  - Leaflet
+  - Docker
+media:
+  kind: image
+  src: ./media.webp
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/malakathon-2026-team-queso-sin-gluten

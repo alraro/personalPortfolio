@@ -11,3 +11,6 @@ coverage/
 lhci-reports/
 .lighthouseci/
 .lycheecache
+
+# Local LinkedIn dump used to pick Events (third parties' posts); never commit.
+participatedEvents/

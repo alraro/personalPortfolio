@@ -1,0 +1,13 @@
+# TODO(owner): draft copy from the repository (it has no README), review before publishing.
+order: 7
+featured: false
+tags:
+  - Docker Compose
+  - Prometheus
+  - Grafana
+  - Loki
+  - Minecraft
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/Server-Minecraft-Software

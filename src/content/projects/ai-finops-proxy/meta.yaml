@@ -1,0 +1,17 @@
+# TODO(owner): draft copy from the repository README and commit history, review before publishing.
+order: 1
+featured: true
+tags:
+  - Python
+  - FastAPI
+  - React
+  - LLM routing
+  - Embeddings
+  - Docker
+media:
+  kind: image
+  src: ./media.png
+links:
+  primary:
+    type: repository
+    url: https://github.com/alraro/AI-FinOps-Multi-Layered-Solution

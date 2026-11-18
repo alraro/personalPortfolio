@@ -41,5 +41,5 @@ A hackathon, competition or volunteering occasion the Owner took part in, with t
 _Avoid_: Activity, talk, conference
 
 **Award**:
-The placement or prize the Owner earned at an Event, such as "2nd place". A Project built at an Event inherits that Event's Award.
+A distinction the organizers or a sponsor announced for the Owner's team at an Event: a placement such as "2nd place", reaching the final, or a special prize such as a sponsor's category award. Merely taking part, or a mid-table ranking, is not an Award. A Project built at an Event inherits that Event's Award.
 _Avoid_: Achievement, trophy, badge

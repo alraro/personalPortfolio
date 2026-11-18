@@ -1,6 +1,7 @@
 ---
 title: Kubernetes Cluster GitOps
 subtitle: A home-lab Kubernetes cluster managed entirely through GitOps with ArgoCD.
+mediaAlt: ArgoCD showing the twelve applications of the cluster, all Synced and Healthy.
 ---
 
 This is my personal Kubernetes home lab, where every change to the cluster is a commit. It currently runs on Oracle Cloud's Free Tier.

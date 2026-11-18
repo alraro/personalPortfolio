@@ -1,6 +1,7 @@
 ---
 title: Kubernetes Cluster GitOps
 subtitle: Un clúster de Kubernetes de laboratorio casero gestionado por completo con GitOps y ArgoCD.
+mediaAlt: ArgoCD con las doce aplicaciones del clúster, todas sincronizadas y en buen estado.
 ---
 
 Este es mi laboratorio personal de Kubernetes, donde cada cambio en el clúster es un commit. Ahora mismo corre en el nivel gratuito de Oracle Cloud.

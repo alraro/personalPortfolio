@@ -9,6 +9,9 @@ tags:
   - Helm
   - cert-manager
   - Sealed Secrets
+media:
+  kind: image
+  src: ./media.webp
 links:
   primary:
     type: repository

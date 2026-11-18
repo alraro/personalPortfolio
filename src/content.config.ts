@@ -148,6 +148,7 @@ const educationMeta = defineCollection({
   schema: z.strictObject({
     institution: z.string().min(1).max(80),
     institutionUrl: httpsUrl.optional(),
+    order: z.number().int().optional(),
     location: z.string().min(1).max(60),
     start: yearMonth,
     end: yearMonth.nullable(),

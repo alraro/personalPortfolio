@@ -1,3 +1,3 @@
 ---
-programme: Student
+programme: 42 Málaga Student
 ---

@@ -58,7 +58,7 @@ To reorder, change `order`. To move a Project between lists, change `featured`.
 
 ### Adding Experience or Education
 
-Create `src/content/experience/<slug>/` or `src/content/education/<slug>/`, again with `meta.yaml`, `en.md` and `es.md`. There is no `order`: items are sorted with the current one first (`end: null`), then by end and start date, newest first.
+Create `src/content/experience/<slug>/` or `src/content/education/<slug>/`, again with `meta.yaml`, `en.md` and `es.md`. Items are sorted with the current one first (`end: null`), then by end and start date, newest first. Education may set an optional integer `order` in `meta.yaml` to override this: lower first, entries without `order` after.
 
 - Experience `meta.yaml`: `organization`, optional `organizationUrl`, `location`, `start` and `end` (`YYYY-MM`, `end: null` for ongoing). Each language file has `role` in the frontmatter.
 - Education `meta.yaml`: `institution`, optional `institutionUrl`, `location`, `start`, `end`. Each language file has `programme`.
@@ -76,7 +76,7 @@ Put the PDF in `public/cv/` named `cv-en.pdf` and/or `cv-es.pdf`. The "Download 
 
 ### Adding Media to a Project
 
-A Project can have optional `media` in its `meta.yaml`, plus a `mediaAlt` (1 to 160 characters) in **both** `en.md` and `es.md`. Without `media`, the Project keeps its generated cover.
+A Project can have optional `media` in its `meta.yaml`, plus a `mediaAlt` (1 to 160 characters) in **both** `en.md` and `es.md`. Without `media`, a Featured Project shows a generated cover and a compact one shows no cover.
 
 - `kind: image`: `src` is an image file inside the Project's folder (for example `./cover.png`). It is optimised automatically.
 - `kind: video`: `mp4` (required) and `webm` (optional) are paths under `public/media/projects/<slug>/`, for example `/media/projects/minirt/demo.mp4`, and `poster` is an image file inside the Project's folder.

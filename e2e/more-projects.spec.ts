@@ -24,18 +24,26 @@ test('compact card: Primary Link, no description, ordered parts', async ({
   page,
 }) => {
   await page.goto('/en/design-system/');
-  const card = page.locator('#project-ds-compact-cover');
+  const card = page.locator('#project-ds-compact-image');
   await expect(card).toBeVisible();
   await expect(card.locator('h3 a')).toHaveAttribute(
     'href',
     'https://example.com/primary',
   );
-  await expect(card.locator('p:not([data-generated-cover] p)')).toHaveCount(1); // subtitle only
+  await expect(card.locator('p')).toHaveCount(1); // subtitle only
   await expect(card.locator('.prose')).toHaveCount(0);
   await expect(card.locator('a a')).toHaveCount(0);
   const media = (await card.locator('[data-project-media]').boundingBox())!;
   const title = (await card.locator('h3').boundingBox())!;
   expect(media.y + media.height).toBeLessThanOrEqual(title.y);
+});
+
+test('compact card without Media has no generated cover', async ({ page }) => {
+  await page.goto('/en/design-system/');
+  const card = page.locator('#project-ds-compact-cover');
+  await expect(card).toBeVisible();
+  await expect(card.locator('[data-project-media]')).toHaveCount(0);
+  await expect(card.locator('[data-generated-cover]')).toHaveCount(0);
 });
 
 test('compact grid shows 1, 2 and 3 columns by width', async ({ page }) => {

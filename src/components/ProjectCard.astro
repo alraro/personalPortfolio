@@ -67,7 +67,11 @@ const layout = {
     </>
   ) : (
     <>
-      <ProjectCardMedia project={project} />
+      {/* Compact cards show only real Media: the generated cover would repeat
+          the title and tags in a frame too small for them. */}
+      {project.media.kind !== 'generated' && (
+        <ProjectCardMedia project={project} />
+      )}
       <ProjectCardTitle
         project={project}
         locale={locale}

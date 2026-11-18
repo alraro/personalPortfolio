@@ -28,6 +28,8 @@ export interface ExperienceMeta extends TimelineMetaBase {
 export interface EducationMeta extends TimelineMetaBase {
   institution: string;
   institutionUrl?: string;
+  /** Optional manual position: lower first, unordered entries last. */
+  order?: number;
 }
 
 interface TimelineTextBase {
@@ -102,6 +104,14 @@ function compareTimeline(a: TimelineMetaBase, b: TimelineMetaBase): number {
   }
   if (a.start !== b.start) return a.start < b.start ? 1 : -1;
   return 0;
+}
+
+/** Explicit `order` ascending (unset last), then like `compareTimeline`. */
+function compareEducation(a: EducationMeta, b: EducationMeta): number {
+  const ao = a.order ?? Number.POSITIVE_INFINITY;
+  const bo = b.order ?? Number.POSITIVE_INFINITY;
+  if (ao !== bo) return ao < bo ? -1 : 1;
+  return compareTimeline(a, b);
 }
 
 function validate(
@@ -190,7 +200,10 @@ export function buildExperienceList(input: {
   });
 }
 
-/** Same as `buildExperienceList`, for Education (description optional). */
+/**
+ * Same as `buildExperienceList`, for Education (description optional),
+ * except that an explicit `order` takes precedence over the dates.
+ */
 export function buildEducationList(input: {
   metas: readonly EducationMeta[];
   texts: readonly EducationText[];
@@ -200,7 +213,7 @@ export function buildEducationList(input: {
   const problems = validate('Education', metas, texts, false);
   if (problems.length > 0) throw new ContentError(problems);
 
-  return [...metas].sort(compareTimeline).map((meta) => {
+  return [...metas].sort(compareEducation).map((meta) => {
     const text = findText(texts, meta.slug, locale)!;
     return {
       slug: meta.slug,

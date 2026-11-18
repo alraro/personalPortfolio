@@ -196,6 +196,20 @@ describe('buildEducationList', () => {
     expect(list[1]!.organization).toBe('Universidad');
   });
 
+  it('puts an explicit order ahead of the dates, unordered entries last', () => {
+    const metas = [
+      meta('newer', { start: '2025-01' }),
+      meta('older', { start: '2023-01', order: 1 }),
+      meta('newest', { start: '2026-01' }),
+    ];
+    const texts = metas.flatMap((m) => [
+      text(m.slug, 'en'),
+      text(m.slug, 'es'),
+    ]);
+    const list = buildEducationList({ metas, texts, locale: 'en' });
+    expect(list.map((e) => e.slug)).toEqual(['older', 'newest', 'newer']);
+  });
+
   it('errors on a missing translation', () => {
     expect(() =>
       buildEducationList({
